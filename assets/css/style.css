@@ -49,10 +49,7 @@ body {
     /* 讓底線不會太緊貼 */
 }
 
-/* .heading_container.heading_center {
-  align-items: center;
-  text-align: center;
-} */
+
 
 .logo img {
     width: 100%;
@@ -263,7 +260,56 @@ a:focus {
     }
 }
 
+/* 調整講座資訊格式 */
+.lecture_detail {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.6;
+    color: #333;
+}
 
+.lecture_detail .lecture-item {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.lecture_detail dt {
+    font-weight: bold;
+    margin-right: 6px;
+    white-space: nowrap;
+}
+
+.lecture_detail dd {
+    margin: 0;
+}
+
+/* 讓主辦與協辦單位的連結橫向排列 */
+.sponsors {
+    display: flex;
+    align-items: flex-start; /* 確保標題與內容對齊 */
+    margin-top: 10px;
+}
+
+.sponsors-title {
+    white-space: nowrap;
+    flex-shrink: 0; /* 確保標題不會被壓縮 */
+    margin-right: 10px; /* 與內容保持距離 */
+}
+
+.sponsors-links {
+    display: grid;
+    grid-template-columns: 1fr; /* 讓內容換行時保持對齊 */
+    gap: 5px; /* 控制行間距 */
+}
+
+.sponsors-links a {
+    text-decoration: none;
+    color: #4F89D8;
+    font-weight: 500;
+}
 
 .lecture_section .filters_menu li {
     padding: 7px 25px;
