@@ -261,6 +261,13 @@ a:focus {
 }
 
 /* 調整講座資訊格式 */
+
+dt, dd {
+    display: inline-block;
+    margin: 0;
+    vertical-align: top;
+}
+
 .lecture_detail {
     display: flex;
     flex-direction: column;
