@@ -25,14 +25,28 @@
   /**
    * Mobile nav toggle
    */
-  // const mobileNavToggleBtn = document.querySelector('.mobile-nav-toggle');
+  const mobileNavToggleBtn = document.querySelector('.mobile-nav-toggle');
 
-  // function mobileNavToogle() {
-  //   document.querySelector('body').classList.toggle('mobile-nav-active');
-  //   mobileNavToggleBtn.classList.toggle('bi-list');
-  //   mobileNavToggleBtn.classList.toggle('bi-x');
-  // }
-  // mobileNavToggleBtn.addEventListener('click', mobileNavToogle);
+  function mobileNavToogle() {
+    document.querySelector('body').classList.toggle('mobile-nav-active');
+    mobileNavToggleBtn.classList.toggle('bi-list');
+    mobileNavToggleBtn.classList.toggle('bi-x');
+
+     if (document.querySelector('body').classList.contains('mobile-nav-active')) {
+    document.querySelectorAll('.navmenu .toggle-dropdown').forEach(dropdown => {
+      dropdown.parentNode.classList.add('active'); // 為父級 <li> 加上 active
+      dropdown.parentNode.nextElementSibling.classList.add('dropdown-active'); // 顯示下拉選單
+    });
+  } else {
+    // **當選單關閉時，隱藏所有下拉選單**
+    document.querySelectorAll('.navmenu .toggle-dropdown').forEach(dropdown => {
+      dropdown.parentNode.classList.remove('active');
+      dropdown.parentNode.nextElementSibling.classList.remove('dropdown-active');
+    });
+  }
+    
+  }
+  mobileNavToggleBtn.addEventListener('click', mobileNavToogle);
 
   /**
    * Hide mobile nav on same-page/hash links

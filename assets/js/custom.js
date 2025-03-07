@@ -87,14 +87,21 @@ $(document).ready(function () {
 $(document).ready(function () {
   var header = $(".header");
   var logo = $(".logo img"); // 選取 LOGO 圖片
+  // var navLinks = $(".navmenu .navcolor"); // 選取導航列文字
 
   $(window).scroll(function () {
     if ($(this).scrollTop() > 50) {
       header.addClass("header_scrolled");
       logo.attr("src", "assets/img/logo-white.svg"); // 替換 LOGO 圖片
+      $(".navmenu span").addClass("t_navcolor");
+      $("#hbg").addClass("navcolor");
     } else {
       header.removeClass("header_scrolled");
       logo.attr("src", "assets/img/logo-blue.svg"); // 恢復原本 LOGO
+      $(".navmenu span").removeClass("t_navcolor"); // 變回黑色  
+      $("#hbg").removeClass("navcolor");
     }
   });
 });
+
+
