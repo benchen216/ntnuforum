@@ -25,6 +25,7 @@ body {
     position: relative;
     margin-bottom: 0;
     font-size: 2.5rem;
+
     font-weight: bold;
 }
 
@@ -432,9 +433,18 @@ dt, dd {
     background-color: #042C47;
 }
 
-.container h3 {
+.de_container h3 {
     font-weight: 600;
     color: #042C47;
+}
+
+.de_container p {
+    text-align: justify;
+    line-height: 36px;
+}
+
+.de_container li{
+    line-height: 36px;
 }
 
 /* footer section */
