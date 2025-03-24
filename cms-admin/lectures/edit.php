@@ -27,105 +27,132 @@ if($result->num_rows == 0) {
 $lecture = $result->fetch_assoc();
 
 if(isset($_POST['submit'])) {
-    // 基本資訊
-    $title = $conn->real_escape_string($_POST['title']);
-    $title_en = $conn->real_escape_string($_POST['title_en']);
-    $speaker = $conn->real_escape_string($_POST['speaker']);
-    $speaker_en = $conn->real_escape_string($_POST['speaker_en']);
-    $speaker_title = $conn->real_escape_string($_POST['speaker_title']);
-    $speaker_title_en = $conn->real_escape_string($_POST['speaker_title_en']);
+    $required_fields = [
+        'title' => '講座標題(中文)',
+        'title_en' => '講座標題(英文)',
+        'speaker' => '講者姓名(中文)',
+        'speaker_en' => '講者姓名(英文)',
+        'speaker_title' => '講者頭銜(中文)',
+        'speaker_title_en' => '講者頭銜(英文)',
+        'lecture_date' => '講座日期',
+        'lecture_time' => '講座時間',
+        'location' => '地點(中文)',
+        'location_en' => '地點(英文)',
+        'organizer' => '主辦單位(中文)',
+        'organizer_en' => '主辦單位(英文)'
+    ];
 
-    // 時間地點
-    $lecture_date = $conn->real_escape_string($_POST['lecture_date']);
-    $lecture_time = $conn->real_escape_string($_POST['lecture_time']);
-    $location = $conn->real_escape_string($_POST['location']);
-    $location_en = $conn->real_escape_string($_POST['location_en']);
-
-    // 狀態與分類
-    $status = $conn->real_escape_string($_POST['status']);
-    $category_id = (int)$_POST['category_id'];
-    $sort_order = (int)$_POST['sort_order'];
-    $is_visible = isset($_POST['is_visible']) ? 1 : 0;
-
-    // 內容描述
-    $description = $conn->real_escape_string($_POST['description']);
-    $description_en = $conn->real_escape_string($_POST['description_en']);
-    $agenda = $conn->real_escape_string($_POST['agenda']);
-    $agenda_en = $conn->real_escape_string($_POST['agenda_en']);
-    $summary = $conn->real_escape_string($_POST['summary']);
-    $summary_en = $conn->real_escape_string($_POST['summary_en']);
-    $speaker_intro = $conn->real_escape_string($_POST['speaker_intro']);
-    $speaker_intro_en = $conn->real_escape_string($_POST['speaker_intro_en']);
-
-    // 主辦單位
-    $organizer = $conn->real_escape_string($_POST['organizer']);
-    $organizer_en = $conn->real_escape_string($_POST['organizer_en']);
-    $organizer_url = $conn->real_escape_string($_POST['organizer_url']);
-    $co_organizer = $conn->real_escape_string($_POST['co_organizer']);
-    $co_organizer_en = $conn->real_escape_string($_POST['co_organizer_en']);
-    $co_organizer_urls = $conn->real_escape_string($_POST['co_organizer_urls']);
-
-    // 報名相關
-    $signup_url = $conn->real_escape_string($_POST['signup_url']);
-    $signup_limit = empty($_POST['signup_limit']) ? null : (int)$_POST['signup_limit'];
-    $signup_deadline = $conn->real_escape_string($_POST['signup_deadline']);
-
-    // 線上會議
-    $online_url = $conn->real_escape_string($_POST['online_url']);
-    $meeting_id = $conn->real_escape_string($_POST['meeting_id']);
-    $meeting_password = $conn->real_escape_string($_POST['meeting_password']);
-
-    // 處理講者照片上傳
-    $speaker_photo = $lecture['speaker_photo'];
-    if(isset($_FILES['speaker_photo']) && $_FILES['speaker_photo']['error'] == 0) {
-        $target_dir = "../../assets/img/speakers/";
-        $file_extension = pathinfo($_FILES["speaker_photo"]["name"], PATHINFO_EXTENSION);
-        $new_filename = uniqid() . '.' . $file_extension;
-        $target_file = $target_dir . $new_filename;
-
-        if(move_uploaded_file($_FILES["speaker_photo"]["tmp_name"], $target_file)) {
-            // 刪除舊照片
-            if($speaker_photo && file_exists($target_dir . $speaker_photo)) {
-                unlink($target_dir . $speaker_photo);
-            }
-            $speaker_photo = $new_filename;
+    $errors = [];
+    foreach($required_fields as $field => $label) {
+        if(empty($_POST[$field])) {
+            $errors[] = $label . "為必填欄位";
         }
     }
-
-    $sql = "UPDATE lectures SET 
-            title=?, title_en=?, speaker=?, speaker_en=?, 
-            speaker_title=?, speaker_title_en=?, speaker_photo=?,
-            lecture_date=?, lecture_time=?, location=?, location_en=?,
-            status=?, category_id=?, sort_order=?, is_visible=?,
-            description=?, description_en=?, agenda=?, agenda_en=?,
-            summary=?, summary_en=?, speaker_intro=?, speaker_intro_en=?,
-            organizer=?, organizer_en=?, organizer_url=?,
-            co_organizer=?, co_organizer_en=?, co_organizer_urls=?,
-            signup_url=?, signup_limit=?, signup_deadline=?,
-            online_url=?, meeting_id=?, meeting_password=?
-            WHERE id=?";
-
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssssssssssssiisssssssssssssssssssssi",
-        $title, $title_en, $speaker, $speaker_en,
-        $speaker_title, $speaker_title_en, $speaker_photo,
-        $lecture_date, $lecture_time, $location, $location_en,
-        $status, $category_id, $sort_order, $is_visible,
-        $description, $description_en, $agenda, $agenda_en,
-        $summary, $summary_en, $speaker_intro, $speaker_intro_en,
-        $organizer, $organizer_en, $organizer_url,
-        $co_organizer, $co_organizer_en, $co_organizer_urls,
-        $signup_url, $signup_limit, $signup_deadline,
-        $online_url, $meeting_id, $meeting_password,
-        $id
-    );
-
-    if($stmt->execute()) {
-        $_SESSION['message'] = "講座更新成功！";
-        header('Location: index.php');
-        exit();
+    if(!empty($errors)) {
+        $error = implode("<br>", $errors);
     } else {
-        $error = "發生錯誤，請稍後再試。";
+        // 基本資訊
+        $title = $conn->real_escape_string($_POST['title']);
+        $title_en = $conn->real_escape_string($_POST['title_en']);
+        $speaker = $conn->real_escape_string($_POST['speaker']);
+        $speaker_en = $conn->real_escape_string($_POST['speaker_en']);
+        $speaker_title = $conn->real_escape_string($_POST['speaker_title']);
+        $speaker_title_en = $conn->real_escape_string($_POST['speaker_title_en']);
+
+        // 時間地點
+        $lecture_date = $conn->real_escape_string($_POST['lecture_date']);
+        $lecture_time = $conn->real_escape_string($_POST['lecture_time']);
+        $location = $conn->real_escape_string($_POST['location']);
+        $location_en = $conn->real_escape_string($_POST['location_en']);
+
+        // 狀態與分類
+        $status = $conn->real_escape_string($_POST['status']);
+        $category_id = (int)$_POST['category_id'];
+        $sort_order = (int)$_POST['sort_order'];
+        $is_visible = isset($_POST['is_visible']) ? 1 : 0;
+
+        // 內容描述
+        $description = $conn->real_escape_string($_POST['description']);
+        $description_en = $conn->real_escape_string($_POST['description_en']);
+        $agenda = $conn->real_escape_string($_POST['agenda']);
+        $agenda_en = $conn->real_escape_string($_POST['agenda_en']);
+        $summary = $conn->real_escape_string($_POST['summary']);
+        $summary_en = $conn->real_escape_string($_POST['summary_en']);
+        $speaker_intro = $conn->real_escape_string($_POST['speaker_intro']);
+        $speaker_intro_en = $conn->real_escape_string($_POST['speaker_intro_en']);
+
+        // 主辦單位
+        $organizer = $conn->real_escape_string($_POST['organizer']);
+        $organizer_en = $conn->real_escape_string($_POST['organizer_en']);
+        $organizer_url = $conn->real_escape_string($_POST['organizer_url']);
+        $co_organizer = $conn->real_escape_string($_POST['co_organizer']);
+        $co_organizer_en = $conn->real_escape_string($_POST['co_organizer_en']);
+        $co_organizer_urls = $conn->real_escape_string($_POST['co_organizer_urls']);
+
+        // 報名相關
+        $signup_url = $conn->real_escape_string($_POST['signup_url']);
+        $signup_limit = empty($_POST['signup_limit']) ? 0 : (int)$_POST['signup_limit'];
+        $signup_deadline = $conn->real_escape_string($_POST['signup_deadline'])===''?null:$conn->real_escape_string($_POST['signup_deadline']);
+
+        // 線上會議
+        $online_url = $conn->real_escape_string($_POST['online_url']);
+        $meeting_id = $conn->real_escape_string($_POST['meeting_id']);
+        $meeting_password = $conn->real_escape_string($_POST['meeting_password']);
+
+        // 處理講者照片上傳
+        $speaker_photo = $lecture['speaker_photo'];
+        if (isset($_FILES['speaker_photo']) && $_FILES['speaker_photo']['error'] == 0) {
+            $target_dir = "../../assets/img/speakers/";
+            $file_extension = pathinfo($_FILES["speaker_photo"]["name"], PATHINFO_EXTENSION);
+            $new_filename = uniqid() . '.' . $file_extension;
+            $target_file = $target_dir . $new_filename;
+
+            if (move_uploaded_file($_FILES["speaker_photo"]["tmp_name"], $target_file)) {
+                // 刪除舊照片
+                if ($speaker_photo && file_exists($target_dir . $speaker_photo)) {
+                    unlink($target_dir . $speaker_photo);
+                }
+                $speaker_photo = $new_filename;
+            }
+        }
+
+        // 修改 SQL 語句的參數綁定類型
+        $sql = "UPDATE lectures SET 
+        title=?, title_en=?, speaker=?, speaker_en=?, 
+        speaker_title=?, speaker_title_en=?, speaker_photo=?,
+        lecture_date=?, lecture_time=?, location=?, location_en=?,
+        status=?, category_id=?, sort_order=?, is_visible=?,
+        description=?, description_en=?, agenda=?, agenda_en=?,
+        summary=?, summary_en=?, speaker_intro=?, speaker_intro_en=?,
+        organizer=?, organizer_en=?, organizer_url=?,
+        co_organizer=?, co_organizer_en=?, co_organizer_urls=?,
+        signup_url=?, signup_limit=?, signup_deadline=?,
+        online_url=?, meeting_id=?, meeting_password=?
+        WHERE id=?";
+
+// 修改參數綁定類型，使其與 add.php 一致
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ssssssssssssiisssssssssssssssisssssi",
+            $title, $title_en, $speaker, $speaker_en,
+            $speaker_title, $speaker_title_en, $speaker_photo,
+            $lecture_date, $lecture_time, $location, $location_en,
+            $status, $category_id, $sort_order, $is_visible,
+            $description, $description_en, $agenda, $agenda_en,
+            $summary, $summary_en, $speaker_intro, $speaker_intro_en,
+            $organizer, $organizer_en, $organizer_url,
+            $co_organizer, $co_organizer_en, $co_organizer_urls,
+            $signup_url, $signup_limit, $signup_deadline,
+            $online_url, $meeting_id, $meeting_password,
+            $id
+        );
+
+        if ($stmt->execute()) {
+            $_SESSION['message'] = "講座更新成功！";
+            header('Location: index.php');
+            exit();
+        } else {
+            $error = "發生錯誤，請稍後再試。";
+        }
     }
 }
 
