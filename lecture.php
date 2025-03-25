@@ -24,6 +24,8 @@ if($result->num_rows == 0) {
 }
 
 $lecture = $result->fetch_assoc();
+$categories_sql = "SELECT * FROM lecture_categories WHERE is_visible = 1 ORDER BY sort_order ASC";
+$categories_result = $conn->query($categories_sql);
 ?>
 <!DOCTYPE html>
 <html lang="zh-TW">
@@ -198,7 +200,7 @@ $lecture = $result->fetch_assoc();
 
             <?php if($lecture['description']): ?>
                 <h3>講座描述</h3>
-                <p><?php echo nl2br(htmlspecialchars($lecture['description'])); ?></p>
+                <?php echo $lecture['description']; ?>
             <?php endif; ?>
 
             <?php if($lecture['online_url'] && ($lecture['meeting_id'] || $lecture['meeting_password'])): ?>

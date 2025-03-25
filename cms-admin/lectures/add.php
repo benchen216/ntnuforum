@@ -6,6 +6,14 @@ if(!isset($_SESSION['user_id'])) {
 }
 
 require_once '../config/database.php';
+function purify_html($html) {
+    require_once '../includes/htmlpurifier/HTMLPurifier.auto.php';
+    $config = HTMLPurifier_Config::createDefault();
+    // 配置允許的HTML標籤和屬性
+    $config->set('HTML.Allowed', 'p,b,i,strong,em,a[href|target],ul,ol,li,br,span,img[src|alt|width|height],h1,h2,h3,h4,h5,h6,table,tr,td,th,thead,tbody,hr,blockquote,div,code,pre');
+    $purifier = new HTMLPurifier($config);
+    return $purifier->purify($html);
+}
 
 if(isset($_POST['submit'])) {
     $required_fields = [
@@ -54,8 +62,8 @@ if(isset($_POST['submit'])) {
         $is_visible = isset($_POST['is_visible']) ? 1 : 0;
 
         // 內容描述
-        $description = $conn->real_escape_string($_POST['description']);
-        $description_en = $conn->real_escape_string($_POST['description_en']);
+        $description = purify_html($_POST['description']);
+        $description_en = purify_html($_POST['description_en']);
         $agenda = $conn->real_escape_string($_POST['agenda']);
         $agenda_en = $conn->real_escape_string($_POST['agenda_en']);
         $summary = $conn->real_escape_string($_POST['summary']);
@@ -80,7 +88,6 @@ if(isset($_POST['submit'])) {
         $online_url = $conn->real_escape_string($_POST['online_url']);
         $meeting_id = $conn->real_escape_string($_POST['meeting_id']);
         $meeting_password = $conn->real_escape_string($_POST['meeting_password']);
-
         // 處理講者照片上傳
         $speaker_photo = '';
         if (isset($_FILES['speaker_photo']) && $_FILES['speaker_photo']['error'] == 0) {
@@ -138,6 +145,78 @@ if(isset($_POST['submit'])) {
 
 require_once '../includes/header.php';
 ?>
+<!--    <script src="https://cdn.tiny.cloud/1/rph01osxwgpmr6a9tsn8nqobmochneucyu5sgbxnigpv1z7d/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>-->
+    <script src="../assets/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
+    <script>
+        tinymce.init({
+            selector: '.tinymce-editor',
+            plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed permanentpen footnotes advtemplate advtable advcode editimage tableofcontents mergetags powerpaste tinymcespellchecker autocorrect typography inlinecss',
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+            images_upload_url: '../upload.php',
+            convert_urls:false,
+            plugins_url: '../assets/tinymce/plugins/', // 確保路徑正確// 你需要創建一個處理圖片上傳的PHP文件
+            language: 'zh_TW', // 設置為繁體中文
+            license_key: 'gpl',
+            height: 500,
+            promotion: false,
+            branding: false,
+            // 允許貼上時保留格式
+            paste_enable_default_filters: false,
+            paste_word_valid_elements: "b,strong,i,em,h1,h2,h3,h4,h5,h6,p,ol,ul,li,a[href],img[src]",
+            // 設置圖片上傳處理
+            images_upload_handler: function (blobInfo, progress) {  // 注意參數變更
+                return new Promise((resolve, reject) => {  // 返回Promise對象
+                    var xhr, formData;
+                    xhr = new XMLHttpRequest();
+                    xhr.withCredentials = false;
+                    xhr.open('POST', '../upload.php');
+
+                    // 如果需要進度顯示，可以取消註釋下面的代碼
+                    if (progress) {  // 檢查progress是否存在
+                        xhr.upload.onprogress = function (e) {
+                            progress(e.loaded / e.total * 100);
+                        };
+                    }
+
+                    xhr.onload = function() {
+                        var json;
+
+                        if (xhr.status === 403) {
+                            reject({ message: 'HTTP Error: ' + xhr.status, remove: true });  // 使用reject替代failure
+                            return;
+                        }
+
+                        if (xhr.status < 200 || xhr.status >= 300) {
+                            reject('HTTP Error: ' + xhr.status);
+                            return;
+                        }
+
+                        try {
+                            json = JSON.parse(xhr.responseText);
+                        } catch (e) {
+                            reject('Invalid JSON response: ' + xhr.responseText);
+                            return;
+                        }
+
+                        if (!json || typeof json.location != 'string') {
+                            reject('Invalid JSON structure: ' + xhr.responseText);
+                            return;
+                        }
+                        resolve(json.location);  // 使用resolve替代success
+                    };
+
+                    xhr.onerror = function () {
+                        reject('Image upload failed due to a network error');
+                    };
+
+                    formData = new FormData();
+                    formData.append('file', blobInfo.blob(), blobInfo.filename());
+
+                    xhr.send(formData);
+                });
+            }
+        });
+    </script>
 
     <div class="container-fluid">
         <div class="row">
@@ -260,13 +339,15 @@ require_once '../includes/header.php';
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-12 mb-3">
                                     <label class="form-label">講座描述(中文)</label>
-                                    <textarea name="description" class="form-control" rows="4"></textarea>
+                                    <textarea name="description" class="form-control tinymce-editor"  rows="4"></textarea>
                                 </div>
-                                <div class="col-md-6 mb-3">
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
                                     <label class="form-label">講座描述(英文)</label>
-                                    <textarea name="description_en" class="form-control" rows="4"></textarea>
+                                    <textarea name="description_en" class="form-control tinymce-editor"  rows="4"></textarea>
                                 </div>
                             </div>
 
