@@ -15,6 +15,33 @@ if(isset($_POST['submit'])) {
     $description_en = $conn->real_escape_string($_POST['description_en']);
     $sort_order = (int)$_POST['sort_order'];
     $is_visible = isset($_POST['is_visible']) ? 1 : 0;
+    if(isset($_FILES['banner']) && $_FILES['banner']['error'] == 0) {
+        $allowed = ['jpg', 'jpeg', 'png'];
+        $filename = $_FILES['banner']['name'];
+        $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+
+        if(in_array($ext, $allowed)) {
+            // 使用 slug 作為檔案名稱
+            $new_filename = $slug . '.' . $ext;
+            $upload_path = '../../assets/img/banner/' . $new_filename;
+
+            if(move_uploaded_file($_FILES['banner']['tmp_name'], $upload_path)) {
+                // 如果是 PNG，轉換為 JPG
+                if($ext == 'png') {
+                    $image = imagecreatefrompng($upload_path);
+                    $bg = imagecreatetruecolor(imagesx($image), imagesy($image));
+                    imagefill($bg, 0, 0, imagecolorallocate($bg, 255, 255, 255));
+                    imagealphablending($bg, TRUE);
+                    imagecopy($bg, $image, 0, 0, 0, 0, imagesx($image), imagesy($image));
+                    imagedestroy($image);
+                    $jpg_path =  '../../assets/img/banner/' . $slug . '.jpg';
+                    imagejpeg($bg, $jpg_path, 90);
+                    imagedestroy($bg);
+                    unlink($upload_path); // 刪除原始的 PNG
+                }
+            }
+        }
+    }
 
     // 檢查 slug 是否已存在
     $check_sql = "SELECT id FROM lecture_categories WHERE slug = ?";
@@ -57,7 +84,7 @@ require_once '../includes/header.php';
                 <div class="alert alert-danger"><?php echo $error; ?></div>
             <?php endif; ?>
 
-            <form method="POST" class="needs-validation" novalidate>
+            <form method="POST" class="needs-validation" novalidate enctype="multipart/form-data">
                 <div class="card mb-4">
                     <div class="card-body">
                         <div class="row">
@@ -75,6 +102,11 @@ require_once '../includes/header.php';
                             <label class="form-label">網址別名</label>
                             <input type="text" name="slug" class="form-control" required>
                             <div class="form-text">請使用英文小寫、數字和連字符(-)</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Banner 圖片</label>
+                            <input type="file" name="banner" class="form-control" accept="image/jpeg,image/png">
+                            <div class="form-text">建議尺寸 1920x1080 像素，格式為 JPG</div>
                         </div>
 
                         <div class="row">

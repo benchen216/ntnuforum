@@ -1,5 +1,7 @@
 <?php
 require_once 'cms-admin/config/database.php';
+$categories_sql = "SELECT * FROM lecture_categories WHERE is_visible = 1 ORDER BY sort_order ASC";
+$categories_result = $conn->query($categories_sql);
 ?>
 <!DOCTYPE html>
 <html lang="zh-TW">
@@ -42,8 +44,14 @@ require_once 'cms-admin/config/database.php';
                         <a href="#"><span>系列講座</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
                         <ul>
                             <li><a href="index.php">全部系列</a></li>
-                            <li><a href="index.php?category=science">科學系列</a></li>
-                            <li><a href="index.php?category=economics">經濟系列</a></li>
+                            <?php
+                            // 重置結果指標
+                            $categories_result->data_seek(0);
+                            while($category = $categories_result->fetch_assoc()): ?>
+                                <li><a href="index.php?category=<?php echo htmlspecialchars($category['slug']); ?>">
+                                        <?php echo htmlspecialchars($category['name']); ?>系列
+                                    </a></li>
+                            <?php endwhile; ?>
                         </ul>
                     </li>
                 </ul>
@@ -59,15 +67,13 @@ require_once 'cms-admin/config/database.php';
     <div id="lecture_detail" class="lecture-detail">
         <div id="lecture-banner" class="lecture-banner">
             <?php
-            $banner_image = 'detail.jpg';
+            $banner_image = 'detail.jpg'; // 預設圖片
+
             if(isset($_GET['category'])) {
-                switch($_GET['category']) {
-                    case 'science':
-                        $banner_image = 'science.jpg';
-                        break;
-                    case 'economics':
-                        $banner_image = 'economy.jpg';
-                        break;
+                $category_slug = $_GET['category'];
+                // 檢查是否有對應的 banner 圖片
+                if(file_exists("assets/img/banner/{$category_slug}.jpg")) {
+                    $banner_image = $category_slug . '.jpg';
                 }
             }
             ?>

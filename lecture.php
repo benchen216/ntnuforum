@@ -66,8 +66,14 @@ $lecture = $result->fetch_assoc();
                         <a href="#"><span>系列講座</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
                         <ul>
                             <li><a href="index.php">全部系列</a></li>
-                            <li><a href="index.php?category=science">科學系列</a></li>
-                            <li><a href="index.php?category=economics">經濟系列</a></li>
+                            <?php
+                            // 重置結果指標
+                            $categories_result->data_seek(0);
+                            while($category = $categories_result->fetch_assoc()): ?>
+                                <li><a href="index.php?category=<?php echo htmlspecialchars($category['slug']); ?>">
+                                        <?php echo htmlspecialchars($category['name']); ?>系列
+                                    </a></li>
+                            <?php endwhile; ?>
                         </ul>
                     </li>
                 </ul>
