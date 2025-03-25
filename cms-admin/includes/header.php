@@ -6,7 +6,7 @@
     <title>講座管理系統</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="/series_lectures/cms-admin/assets/css/dashboard.css" rel="stylesheet">
+    <link href="/series_lecture/cms-admin/assets/css/dashboard.css" rel="stylesheet">
 </head>
 <body>
     <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
@@ -16,7 +16,7 @@
         </button>
         <div class="navbar-nav">
             <div class="nav-item text-nowrap">
-                <a class="nav-link px-3" href="logout.php">登出</a>
+                <a class="nav-link px-3" href="/series_lecture/cms-admin/logout.php">登出</a>
             </div>
         </div>
     </header>

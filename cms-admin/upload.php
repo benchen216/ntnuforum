@@ -31,7 +31,7 @@ if ($_FILES["file"]["size"] > 5000000) {
 
 if (move_uploaded_file($_FILES["file"]["tmp_name"], $target_file)) {
     echo json_encode([
-        'location' => '/series_lectures_test/assets/uploads/' . $new_filename
+        'location' => '/series_lecture/assets/uploads/' . $new_filename
     ]);
 } else {
     echo json_encode(['error' => 'Upload failed']);
