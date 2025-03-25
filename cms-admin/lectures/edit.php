@@ -7,7 +7,7 @@ if(!isset($_SESSION['user_id'])) {
 
 require_once '../config/database.php';
 
-// 添加HTML净化函数
+
 function purify_html($html) {
     require_once '../includes/htmlpurifier/HTMLPurifier.auto.php';
     $config = HTMLPurifier_Config::createDefault();
