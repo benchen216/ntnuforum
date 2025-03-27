@@ -71,11 +71,11 @@ $categories_result = $conn->query($categories_sql);
                 $category_slug = $_GET['category'];
                 $banner_image = 'detail.jpg'; // 預設圖片
                 // 檢查是否有對應的 banner 圖片
-                if(file_exists("../assets/img/banner/{$category_slug}.jpg")) {
+                if(file_exists("assets/img/banner/{$category_slug}.jpg")) {
                     $banner_image = $category_slug . '.jpg';
                 }
                 ?>
-                <img src="../assets/img/banner/<?php echo $banner_image; ?>" alt="Banner Image" class="lecture-image">
+                <img src="assets/img/banner/<?php echo $banner_image; ?>" alt="Banner Image" class="lecture-image">
             <?php } else { ?>
                 <div id="carouselIndicators" class="carousel slide" data-bs-ride="carousel">
                     <div id="hero-carousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
@@ -153,10 +153,22 @@ $categories_result = $conn->query($categories_sql);
                     }
 
                     $sql = "SELECT l.*, c.name_en as category_name 
-                            FROM lectures l 
-                            LEFT JOIN lecture_categories c ON l.category_id = c.id 
-                            $where 
-                            ORDER BY l.lecture_date ASC";
+FROM lectures l 
+LEFT JOIN lecture_categories c ON l.category_id = c.id 
+$where 
+ORDER BY 
+    CASE 
+        WHEN l.status = 'coming' THEN 1 
+        ELSE 2 
+    END,
+    CASE 
+        WHEN l.status = 'coming' THEN l.lecture_date
+        ELSE NULL
+    END ASC,
+    CASE 
+        WHEN l.status != 'coming' THEN l.lecture_date
+        ELSE NULL
+    END DESC";
 
                     $stmt = $conn->prepare($sql);
                     if(!empty($params)) {

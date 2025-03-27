@@ -152,10 +152,22 @@ $categories_result = $conn->query($categories_sql);
                     }
 
                     $sql = "SELECT l.*, c.name as category_name 
-        FROM lectures l 
-        LEFT JOIN lecture_categories c ON l.category_id = c.id 
-        $where 
-        ORDER BY l.lecture_date ASC";
+FROM lectures l 
+LEFT JOIN lecture_categories c ON l.category_id = c.id 
+$where 
+ORDER BY 
+    CASE 
+        WHEN l.status = 'coming' THEN 1 
+        ELSE 2 
+    END,
+    CASE 
+        WHEN l.status = 'coming' THEN l.lecture_date
+        ELSE NULL
+    END ASC,
+    CASE 
+        WHEN l.status != 'coming' THEN l.lecture_date
+        ELSE NULL
+    END DESC";
 
                     $stmt = $conn->prepare($sql);
                     if(!empty($params)) {
