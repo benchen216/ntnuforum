@@ -82,7 +82,7 @@ $categories_result = $conn->query($categories_sql);
                         <div class="carousel-inner">
                             <!-- 一張圖 -->
                             <div class="carousel-item active">
-                                <img src="../assets/img/carousel/carousel-1.jpg" class="d-block w-100" alt="">
+                                <img src="assets/img/carousel/carousel-1.jpg" class="d-block w-100" alt="">
                             </div><!-- End 一張圖 -->
                             <!-- 一張圖 -->
                             <div class="carousel-item">
@@ -101,8 +101,8 @@ $categories_result = $conn->query($categories_sql);
                         </a>
                         <!-- 下方點點選單 (只顯示兩個點) -->
                         <div class="carousel-indicators">
-                            <button type="button" data-bs-target="#hero-carousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-                            <button type="button" data-bs-target="#hero-carousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+<!--                            <button type="button" data-bs-target="#hero-carousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>-->
+<!--                            <button type="button" data-bs-target="#hero-carousel" data-bs-slide-to="1" aria-label="Slide 2"></button>-->
                         </div>
                     </div>
                 </div>

@@ -100,8 +100,8 @@ $categories_result = $conn->query($categories_sql);
                     </button>
                     <!-- 下方點點選單 -->
                     <div class="carousel-indicators">
-                        <button type="button" data-bs-target="#hero-carousel" data-bs-slide-to="0" class="active" aria-current="true"></button>
-                        <button type="button" data-bs-target="#hero-carousel" data-bs-slide-to="1"></button>
+<!--                        <button type="button" data-bs-target="#hero-carousel" data-bs-slide-to="0" class="active" aria-current="true"></button>-->
+<!--                        <button type="button" data-bs-target="#hero-carousel" data-bs-slide-to="1"></button>-->
                     </div>
                 </div>
             <?php } ?>
