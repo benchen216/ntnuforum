@@ -104,9 +104,9 @@ $categories_result = $conn->query($categories_sql);
                     </h2>
                 </div>
                 <ul class="filters_menu">
-                    <li class="active" data-filter="*">All Lectures</li>
+                    <li class="active" data-filter="*">All</li>
                     <li data-filter=".coming">Upcoming</li>
-                    <li data-filter=".passed">Past Lectures</li>
+                    <li data-filter=".passed">Past</li>
                 </ul>
             </div>
 
@@ -242,14 +242,30 @@ $categories_result = $conn->query($categories_sql);
 <!-- Preloader -->
 <div id="preloader"></div>
 
-<!-- JS Files -->
+<!-- Vendor JS Files -->
 <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="../assets/vendor/php-email-form/validate.js"></script>
 <script src="../assets/vendor/aos/aos.js"></script>
 <script src="../assets/vendor/glightbox/js/glightbox.min.js"></script>
+<script src="../assets/vendor/purecounter/purecounter_vanilla.js"></script>
 <script src="../assets/vendor/swiper/swiper-bundle.min.js"></script>
+<!-- jQery -->
 <script src="../assets/js/jquery-3.4.1.min.js"></script>
+<!-- popper js -->
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous">
+</script>
+<!-- bootstrap js -->
+<script src="../assets/js/bootstrap.js"></script>
+<!-- owl slider -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js">
+</script>
+<!-- isotope js -->
 <script src="https://unpkg.com/isotope-layout@3.0.4/dist/isotope.pkgd.min.js"></script>
+<!-- nice select -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/js/jquery.nice-select.min.js"></script>
+<!-- custom js -->
 <script src="../assets/js/custom.js"></script>
+<!-- Main JS File -->
 <script src="../assets/js/main.js"></script>
 </body>
 </html>

@@ -8,15 +8,15 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/series_lecture/cms-admin/categories/index.php">
-                    <i class="bi bi-journal-text"></i>
-                    類別管理
-                </a>
-            </li>
-            <li class="nav-item">
                 <a class="nav-link" href="/series_lecture/cms-admin/lectures/index.php">
                     <i class="bi bi-calendar-event"></i>
                     講座管理
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/series_lecture/cms-admin/categories/index.php">
+                    <i class="bi bi-journal-text"></i>
+                    類別管理
                 </a>
             </li>
             <li class="nav-item">

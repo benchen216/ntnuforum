@@ -132,15 +132,40 @@ require_once '../includes/header.php';
 
                         $where_clause = !empty($where_conditions) ? "WHERE " . implode(" AND ", $where_conditions) : "";
 
+                        // 分頁設定
+                        $items_per_page = 10; // 每頁顯示的項目數
+                        $current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+                        $offset = ($current_page - 1) * $items_per_page;
+
+                        // 計算總記錄數
+                        $count_sql = "SELECT COUNT(*) as total FROM lectures l {$where_clause}";
+                        $count_stmt = $conn->prepare($count_sql);
+                        if(!empty($params)) {
+                            $count_stmt->bind_param($param_types, ...$params);
+                        }
+                        $count_stmt->execute();
+                        $count_result = $count_stmt->get_result();
+                        $total_items = $count_result->fetch_assoc()['total'];
+                        $total_pages = ceil($total_items / $items_per_page);
+
+                        // 獲取分頁數據
                         $sql = "SELECT l.*, c.name as category_name, c.name_en as category_name_en 
                             FROM lectures l 
                             LEFT JOIN lecture_categories c ON l.category_id = c.id 
                             {$where_clause} 
-                            ORDER BY l.lecture_date DESC";
+                            ORDER BY l.lecture_date DESC
+                            LIMIT ?, ?";
 
                         $stmt = $conn->prepare($sql);
-                        if(!empty($params)) {
-                            $stmt->bind_param($param_types, ...$params);
+
+                        // 添加 LIMIT 參數
+                        $limit_params = $params;
+                        $limit_params[] = $offset;
+                        $limit_params[] = $items_per_page;
+                        $limit_param_types = $param_types . "ii";
+
+                        if(!empty($limit_params)) {
+                            $stmt->bind_param($limit_param_types, ...$limit_params);
                         }
                         $stmt->execute();
                         $result = $stmt->get_result();
@@ -206,6 +231,85 @@ require_once '../includes/header.php';
                         <?php endwhile; ?>
                         </tbody>
                     </table>
+                </div>
+
+                <!-- 分頁控制 -->
+                <?php if($total_pages > 1): ?>
+                    <nav aria-label="Page navigation" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            <?php
+                            // 保留所有搜尋參數
+                            $query_params = $_GET;
+
+                            // 上一頁按鈕
+                            if($current_page > 1):
+                                $query_params['page'] = $current_page - 1;
+                                $prev_link = '?' . http_build_query($query_params);
+                                ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="<?php echo $prev_link; ?>" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            <?php else: ?>
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+
+                            <?php
+                            // 頁碼按鈕
+                            $start_page = max(1, $current_page - 2);
+                            $end_page = min($total_pages, $current_page + 2);
+
+                            // 如果當前頁面靠近開始或結束，調整顯示的頁碼範圍
+                            if($start_page <= 3) {
+                                $end_page = min(5, $total_pages);
+                            }
+                            if($end_page >= $total_pages - 2) {
+                                $start_page = max(1, $total_pages - 4);
+                            }
+
+                            for($i = $start_page; $i <= $end_page; $i++):
+                                $query_params['page'] = $i;
+                                $page_link = '?' . http_build_query($query_params);
+                                ?>
+                                <li class="page-item <?php echo ($i == $current_page) ? 'active' : ''; ?>">
+                                    <a class="page-link" href="<?php echo $page_link; ?>"><?php echo $i; ?></a>
+                                </li>
+                            <?php endfor; ?>
+
+                            <!-- 下一頁按鈕 -->
+                            <?php
+                            if($current_page < $total_pages):
+                                $query_params['page'] = $current_page + 1;
+                                $next_link = '?' . http_build_query($query_params);
+                                ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="<?php echo $next_link; ?>" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            <?php else: ?>
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+                    </nav>
+                <?php endif; ?>
+
+                <!-- 顯示分頁資訊 -->
+                <div class="text-center mt-2 text-muted">
+                    <small>
+                        顯示 <?php echo $total_items; ?> 筆資料中的
+                        <?php echo min(($current_page - 1) * $items_per_page + 1, $total_items); ?> -
+                        <?php echo min($current_page * $items_per_page, $total_items); ?> 筆
+                    </small>
                 </div>
             </main>
         </div>
