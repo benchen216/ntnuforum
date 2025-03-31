@@ -42,6 +42,38 @@ if(isset($_POST['submit'])) {
             }
         }
     }
+    if(isset($_FILES['banner_en']) && $_FILES['banner_en']['error'] == 0) {
+        $allowed = ['jpg', 'jpeg', 'png'];
+        $filename = $_FILES['banner_en']['name'];
+        $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+
+        if(in_array($ext, $allowed)) {
+            // 確保英文版 banner 目錄存在
+            if (!file_exists('../../en/assets/img/banner/')) {
+                mkdir('../../en/assets/img/banner/', 0777, true);
+            }
+
+            // 使用 slug 作為檔案名稱
+            $new_filename = $slug . '.' . $ext;
+            $upload_path = '../../en/assets/img/banner/' . $new_filename;
+
+            if(move_uploaded_file($_FILES['banner_en']['tmp_name'], $upload_path)) {
+                // 如果是 PNG，轉換為 JPG
+                if($ext == 'png') {
+                    $image = imagecreatefrompng($upload_path);
+                    $bg = imagecreatetruecolor(imagesx($image), imagesy($image));
+                    imagefill($bg, 0, 0, imagecolorallocate($bg, 255, 255, 255));
+                    imagealphablending($bg, TRUE);
+                    imagecopy($bg, $image, 0, 0, 0, 0, imagesx($image), imagesy($image));
+                    imagedestroy($image);
+                    $jpg_path = '../../en/assets/img/banner/' . $slug . '.jpg';
+                    imagejpeg($bg, $jpg_path, 90);
+                    imagedestroy($bg);
+                    unlink($upload_path); // 刪除原始的 PNG
+                }
+            }
+        }
+    }
 
     // 檢查 slug 是否已存在
     $check_sql = "SELECT id FROM lecture_categories WHERE slug = ?";
@@ -106,6 +138,11 @@ require_once '../includes/header.php';
                         <div class="mb-3">
                             <label class="form-label">Banner 圖片</label>
                             <input type="file" name="banner" class="form-control" accept="image/jpeg,image/png">
+                            <div class="form-text">建議尺寸 1920x1080 像素，格式為 JPG</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Banner 圖片 (英文版)</label>
+                            <input type="file" name="banner_en" class="form-control" accept="image/jpeg,image/png">
                             <div class="form-text">建議尺寸 1920x1080 像素，格式為 JPG</div>
                         </div>
 

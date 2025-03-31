@@ -67,17 +67,46 @@ $categories_result = $conn->query($categories_sql);
     <div id="lecture_detail" class="lecture-detail">
         <div id="lecture-banner" class="lecture-banner">
             <?php
-            $banner_image = 'detail.jpg'; // Default image
-
             if(isset($_GET['category'])) {
                 $category_slug = $_GET['category'];
-                // Check if corresponding banner image exists
-                if(file_exists("../assets/img/banner/{$category_slug}.jpg")) {
+                $banner_image = 'detail.jpg'; // 預設圖片
+                // 檢查是否有對應的 banner 圖片
+                if(file_exists("assets/img/banner/{$category_slug}.jpg")) {
                     $banner_image = $category_slug . '.jpg';
                 }
-            }
-            ?>
-            <img src="../assets/img/banner/<?php echo $banner_image; ?>" alt="Banner Image" class="lecture-image">
+                ?>
+                <img src="assets/img/banner/<?php echo $banner_image; ?>" alt="Banner Image" class="lecture-image">
+            <?php } else { ?>
+                <div id="carouselIndicators" class="carousel slide" data-bs-ride="carousel">
+                    <div id="hero-carousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
+                        <div class="carousel-inner">
+                            <!-- 一張圖 -->
+                            <div class="carousel-item active">
+                                <img src="assets/img/carousel/carousel-1.jpg" class="d-block w-100" alt="">
+                            </div><!-- End 一張圖 -->
+                            <!-- 一張圖 -->
+                            <div class="carousel-item">
+                                <img src="../assets/img/carousel/carousel-2.jpg" class="d-block w-100" alt="">
+                            </div><!-- End 一張圖 -->
+                        </div>
+                        <!-- 左箭頭 -->
+                        <a class="carousel-control-prev" href="#hero-carousel" role="button" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </a>
+                        <!-- 右箭頭 -->
+                        <a class="carousel-control-next" href="#hero-carousel" role="button" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </a>
+                        <!-- 下方點點選單 (只顯示兩個點) -->
+                        <div class="carousel-indicators">
+<!--                            <button type="button" data-bs-target="#hero-carousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>-->
+<!--                            <button type="button" data-bs-target="#hero-carousel" data-bs-slide-to="1" aria-label="Slide 2"></button>-->
+                        </div>
+                    </div>
+                </div>
+            <?php } ?>
         </div>
     </div>
 
@@ -90,13 +119,13 @@ $categories_result = $conn->query($categories_sql);
                         Distinguished International Scholar
                         <?php
                         if(isset($_GET['category'])) {
-                            switch($_GET['category']) {
-                                case 'science':
-                                    echo '[Science]';
+                            // 重置結果指標
+                            $categories_result->data_seek(0);
+                            while($category = $categories_result->fetch_assoc()) {
+                                if($category['slug'] === $_GET['category']) {
+                                    echo '[' . htmlspecialchars($category['name_en']) . ']';
                                     break;
-                                case 'economics':
-                                    echo '[Economics]';
-                                    break;
+                                }
                             }
                         }
                         ?>
@@ -124,10 +153,22 @@ $categories_result = $conn->query($categories_sql);
                     }
 
                     $sql = "SELECT l.*, c.name_en as category_name 
-                            FROM lectures l 
-                            LEFT JOIN lecture_categories c ON l.category_id = c.id 
-                            $where 
-                            ORDER BY l.lecture_date DESC";
+FROM lectures l 
+LEFT JOIN lecture_categories c ON l.category_id = c.id 
+$where 
+ORDER BY 
+    CASE 
+        WHEN l.status = 'coming' THEN 1 
+        ELSE 2 
+    END,
+    CASE 
+        WHEN l.status = 'coming' THEN l.lecture_date
+        ELSE NULL
+    END ASC,
+    CASE 
+        WHEN l.status != 'coming' THEN l.lecture_date
+        ELSE NULL
+    END DESC";
 
                     $stmt = $conn->prepare($sql);
                     if(!empty($params)) {

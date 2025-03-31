@@ -149,19 +149,30 @@ $categories_result = $conn->query($categories_sql);
                                         <span class="sponsors-title">Co-organizer |</span>
                                         <div class="sponsors-links">
                                             <?php
-                                            $co_organizers = explode("\n", $lecture['co_organizer_en']);
-                                            $co_organizer_urls = explode("\n", $lecture['co_organizer_urls']);
-                                            foreach($co_organizers as $index => $co_org):
-                                                $url = isset($co_organizer_urls[$index]) ? trim($co_organizer_urls[$index]) : '';
-                                                ?>
-                                                <?php if($url): ?>
-                                                <a href="<?php echo htmlspecialchars($url); ?>" target="_blank">
-                                                    <?php echo htmlspecialchars($co_org); ?>
-                                                </a>
-                                            <?php else: ?>
-                                                <?php echo htmlspecialchars($co_org); ?>
-                                            <?php endif; ?>
-                                            <?php endforeach; ?>
+                                            if($lecture['co_organizer_en']) {
+                                                $co_organizers = array_map('trim', explode("\n", $lecture['co_organizer_en']));
+                                                $co_organizer_urls = array_map('trim', explode("\n", $lecture['co_organizer_urls']));
+
+                                                foreach($co_organizers as $index => $co_org):
+                                                    $co_org = trim($co_org);
+                                                    if(empty($co_org)) continue;
+
+                                                    $url = isset($co_organizer_urls[$index]) ? trim($co_organizer_urls[$index]) : '';
+
+                                                    if($url): ?>
+                                                        <div class="sponsor-item">
+                                                            <a href="<?php echo htmlspecialchars($url); ?>" target="_blank">
+                                                                <?php echo htmlspecialchars($co_org); ?>
+                                                            </a>
+                                                        </div>
+                                                    <?php else: ?>
+                                                        <div class="sponsor-item">
+                                                            <?php echo htmlspecialchars($co_org); ?>
+                                                        </div>
+                                                    <?php endif;
+                                                endforeach;
+                                            }
+                                            ?>
                                         </div>
                                     </div>
                                 <?php endif; ?>
@@ -184,22 +195,23 @@ $categories_result = $conn->query($categories_sql);
     <div class="container">
         <div class="de_container">
             <?php if($lecture['summary_en']): ?>
-                <h3>Abstract</h3>
+                <h3>【Abstract】</h3>
                 <p><?php echo nl2br(htmlspecialchars($lecture['summary_en'])); ?></p>
             <?php endif; ?>
 
             <?php if($lecture['speaker_intro_en']): ?>
-                <h3>Speaker Biography</h3>
+                <h3>【Speaker Biography】</h3>
                 <p><?php echo nl2br(htmlspecialchars($lecture['speaker_intro_en'])); ?></p>
             <?php endif; ?>
 
             <?php if($lecture['agenda_en']): ?>
-                <h3>Agenda</h3>
+                <h3>【Agenda】</h3>
                 <?php echo nl2br(htmlspecialchars($lecture['agenda_en'])); ?>
             <?php endif; ?>
 
             <?php if($lecture['description_en']): ?>
-                <h3>Lecture Description</h3>
+<!--                <h3>【Lecture Description</h3>-->
+            <br>
                 <?php echo $lecture['description_en']; ?>
             <?php endif; ?>
 

@@ -938,7 +938,16 @@ section,
 }
 
 
+.agenda-content {
+  white-space: pre-line;
+  margin-bottom: 2rem;
+}
 
+
+textarea {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
 
 
 

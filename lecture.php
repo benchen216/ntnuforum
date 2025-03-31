@@ -149,19 +149,30 @@ $categories_result = $conn->query($categories_sql);
                                         <span class="sponsors-title">協辦單位｜</span>
                                         <div class="sponsors-links">
                                             <?php
-                                            $co_organizers = explode("\n", $lecture['co_organizer']);
-                                            $co_organizer_urls = explode("\n", $lecture['co_organizer_urls']);
-                                            foreach($co_organizers as $index => $co_org):
-                                                $url = isset($co_organizer_urls[$index]) ? trim($co_organizer_urls[$index]) : '';
-                                                ?>
-                                                <?php if($url): ?>
-                                                <a href="<?php echo htmlspecialchars($url); ?>" target="_blank">
-                                                    <?php echo htmlspecialchars($co_org); ?>
-                                                </a>
-                                            <?php else: ?>
-                                                <?php echo htmlspecialchars($co_org); ?>
-                                            <?php endif; ?>
-                                            <?php endforeach; ?>
+                                            if($lecture['co_organizer']) {
+                                                $co_organizers = array_map('trim', explode("\n", $lecture['co_organizer']));
+                                                $co_organizer_urls = array_map('trim', explode("\n", $lecture['co_organizer_urls']));
+
+                                                foreach($co_organizers as $index => $co_org):
+                                                    $co_org = trim($co_org);
+                                                    if(empty($co_org)) continue; // 跳過空行
+
+                                                    $url = isset($co_organizer_urls[$index]) ? trim($co_organizer_urls[$index]) : '';
+
+                                                    if($url): ?>
+                                                        <div class="sponsor-item">
+                                                            <a href="<?php echo htmlspecialchars($url); ?>" target="_blank">
+                                                                <?php echo htmlspecialchars($co_org); ?>
+                                                            </a>
+                                                        </div>
+                                                    <?php else: ?>
+                                                        <div class="sponsor-item">
+                                                            <?php echo htmlspecialchars($co_org); ?>
+                                                        </div>
+                                                    <?php endif;
+                                                endforeach;
+                                            }
+                                            ?>
                                         </div>
                                     </div>
                                 <?php endif; ?>
@@ -184,22 +195,28 @@ $categories_result = $conn->query($categories_sql);
     <div class="container">
         <div class="de_container">
             <?php if($lecture['summary']): ?>
-                <h3>講題摘要</h3>
+                <h3>【講題摘要】</h3>
                 <p><?php echo nl2br(htmlspecialchars($lecture['summary'])); ?></p>
             <?php endif; ?>
 
             <?php if($lecture['speaker_intro']): ?>
-                <h3>講者簡介</h3>
+                <h3>【講者簡介】</h3>
                 <p><?php echo nl2br(htmlspecialchars($lecture['speaker_intro'])); ?></p>
             <?php endif; ?>
 
             <?php if($lecture['agenda']): ?>
-                <h3>議程</h3>
-                <?php echo nl2br(htmlspecialchars($lecture['agenda'])); ?>
+                <h3>【議程】</h3>
+                <div class="agenda-content">
+                    <?php
+                    $agenda = str_replace("\r\n", "\n", $lecture['agenda']);
+                    echo nl2br(htmlspecialchars($agenda));
+                    ?>
+                </div>
             <?php endif; ?>
 
             <?php if($lecture['description']): ?>
-                <h3>講座描述</h3>
+<!--                <h3>【講座描述】</h3>-->
+                <br>
                 <?php echo $lecture['description']; ?>
             <?php endif; ?>
 

@@ -39,6 +39,28 @@ if($total_categories <= 1) {
     exit();
 }
 
+// 在執行刪除之前，先刪除相關的圖片文件
+$category_sql = "SELECT slug FROM lecture_categories WHERE id = ?";
+$category_stmt = $conn->prepare($category_sql);
+$category_stmt->bind_param("i", $id);
+$category_stmt->execute();
+$category_result = $category_stmt->get_result();
+$category = $category_result->fetch_assoc();
+
+if($category) {
+    // 刪除中文版 banner
+    $banner_path = '../../assets/img/banner/' . $category['slug'] . '.jpg';
+    if(file_exists($banner_path)) {
+        unlink($banner_path);
+    }
+
+    // 刪除英文版 banner
+    $banner_en_path = '../../en/assets/img/banner/' . $category['slug'] . '.jpg';
+    if(file_exists($banner_en_path)) {
+        unlink($banner_en_path);
+    }
+}
+
 // 執行刪除
 $sql = "DELETE FROM lecture_categories WHERE id = ?";
 $stmt = $conn->prepare($sql);

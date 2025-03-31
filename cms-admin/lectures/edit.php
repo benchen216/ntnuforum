@@ -70,8 +70,8 @@ if(isset($_POST['submit'])) {
         $title_en = $conn->real_escape_string($_POST['title_en']);
         $speaker = $conn->real_escape_string($_POST['speaker']);
         $speaker_en = $conn->real_escape_string($_POST['speaker_en']);
-        $speaker_title = $conn->real_escape_string($_POST['speaker_title']);
-        $speaker_title_en = $conn->real_escape_string($_POST['speaker_title_en']);
+        $speaker_title = str_replace(["\r\n", "\r"], "\n",$_POST['speaker_title']);
+        $speaker_title_en = str_replace(["\r\n", "\r"], "\n",$_POST['speaker_title_en']);
 
         // 時間地點
         $lecture_date = $conn->real_escape_string($_POST['lecture_date']);
@@ -88,20 +88,20 @@ if(isset($_POST['submit'])) {
         // 內容描述 - 使用HTML净化
         $description = purify_html($_POST['description']);
         $description_en = purify_html($_POST['description_en']);
-        $agenda = $conn->real_escape_string($_POST['agenda']);
-        $agenda_en = $conn->real_escape_string($_POST['agenda_en']);
-        $summary = $conn->real_escape_string($_POST['summary']);
-        $summary_en = $conn->real_escape_string($_POST['summary_en']);
-        $speaker_intro = $conn->real_escape_string($_POST['speaker_intro']);
-        $speaker_intro_en = $conn->real_escape_string($_POST['speaker_intro_en']);
+        $agenda = str_replace(["\r\n", "\r"], "\n", $_POST['agenda']);
+        $agenda_en = str_replace(["\r\n", "\r"], "\n", $_POST['agenda_en']);
+        $summary = str_replace(["\r\n", "\r"], "\n", $_POST['summary']);
+        $summary_en = str_replace(["\r\n", "\r"], "\n", $_POST['summary_en']);
+        $speaker_intro = str_replace(["\r\n", "\r"], "\n", $_POST['speaker_intro']);
+        $speaker_intro_en = str_replace(["\r\n", "\r"], "\n", $_POST['speaker_intro_en']);
 
         // 主辦單位
         $organizer = $conn->real_escape_string($_POST['organizer']);
         $organizer_en = $conn->real_escape_string($_POST['organizer_en']);
         $organizer_url = $conn->real_escape_string($_POST['organizer_url']);
-        $co_organizer = $conn->real_escape_string($_POST['co_organizer']);
-        $co_organizer_en = $conn->real_escape_string($_POST['co_organizer_en']);
-        $co_organizer_urls = $conn->real_escape_string($_POST['co_organizer_urls']);
+        $co_organizer = str_replace(["\r\n", "\r"], "\n", $_POST['co_organizer']);
+        $co_organizer_en = str_replace(["\r\n", "\r"], "\n", $_POST['co_organizer_en']);
+        $co_organizer_urls = str_replace(["\r\n", "\r"], "\n", $_POST['co_organizer_urls']);
 
         // 報名相關
         $signup_url = $conn->real_escape_string($_POST['signup_url']);
@@ -146,7 +146,7 @@ if(isset($_POST['submit'])) {
 
         // 修改參數綁定類型，使其與 add.php 一致
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssssssssssssiisssssssssssssssisssssi",
+        $stmt->bind_param("ssssssssssssiissssssssssssssssissssi",
             $title, $title_en, $speaker, $speaker_en,
             $speaker_title, $speaker_title_en, $speaker_photo,
             $lecture_date, $lecture_time, $location, $location_en,
@@ -403,13 +403,13 @@ require_once '../includes/header.php';
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-12 mb-3">
-                                    <label class="form-label">講座描述(中文)</label>
+                                    <label class="form-label">講座描述(中文) - html輸入客製化內容</label>
                                     <textarea name="description" class="form-control tinymce-editor" rows="4"><?php echo htmlspecialchars($lecture['description']); ?></textarea>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-12 mb-3">
-                                    <label class="form-label">講座描述(英文)</label>
+                                    <label class="form-label">講座描述(英文) - html輸入客製化內容</label>
                                     <textarea name="description_en" class="form-control tinymce-editor" rows="4"><?php echo htmlspecialchars($lecture['description_en']); ?></textarea>
                                 </div>
                             </div>
@@ -417,11 +417,11 @@ require_once '../includes/header.php';
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">議程(中文)</label>
-                                    <textarea name="agenda" class="form-control" rows="4"><?php echo htmlspecialchars($lecture['agenda']); ?></textarea>
+                                    <textarea name="agenda" class="form-control" rows="4" style="white-space: pre-wrap;"><?php echo htmlspecialchars($lecture['agenda']); ?></textarea>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">議程(英文)</label>
-                                    <textarea name="agenda_en" class="form-control" rows="4"><?php echo htmlspecialchars($lecture['agenda_en']); ?></textarea>
+                                    <textarea name="agenda_en" class="form-control" rows="4" style="white-space: pre-wrap;"><?php echo htmlspecialchars($lecture['agenda_en']); ?></textarea>
                                 </div>
                             </div>
 

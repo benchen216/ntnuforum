@@ -433,7 +433,7 @@ dt, dd {
     background-color: #042C47;
 }
 
-.de_container h3 {
+.de_container h3, .de_container h4 {
     font-weight: 600;
     color: #042C47;
 }
