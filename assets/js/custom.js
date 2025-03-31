@@ -11,25 +11,25 @@ getYear();
 
 
 // isotope js
-$(window).on('load', function () {
-    $('.filters_menu li').click(function () {
-        $('.filters_menu li').removeClass('active');
-        $(this).addClass('active');
-
-        var data = $(this).attr('data-filter');
-        $grid.isotope({
-            filter: data
-        })
-    });
-
-    var $grid = $(".grid").isotope({
-        itemSelector: ".all",
-        percentPosition: false,
-        masonry: {
-            columnWidth: ".all"
-        }
-    })
-});
+// $(window).on('load', function () {
+//     $('.filters_menu li').click(function () {
+//         $('.filters_menu li').removeClass('active');
+//         $(this).addClass('active');
+//
+//         var data = $(this).attr('data-filter');
+//         $grid.isotope({
+//             filter: data
+//         })
+//     });
+//
+//     var $grid = $(".grid").isotope({
+//         itemSelector: ".all",
+//         percentPosition: false,
+//         masonry: {
+//             columnWidth: ".all"
+//         }
+//     })
+// });
 
 // nice select
 $(document).ready(function() {
@@ -105,3 +105,46 @@ $(document).ready(function () {
 });
 
 
+$(document).ready(function() {
+    // 獲取當前 URL 參數
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentFilter = urlParams.get('filter') || '*';
+
+    // 初始化 Isotope
+    var $grid = $(".grid").isotope({
+        itemSelector: '.box',
+        layoutMode: 'vertical'
+    });
+
+    // 設置初始過濾狀態
+    $(".filters_menu li").removeClass("active");
+    $(`.filters_menu li[data-filter="${currentFilter}"]`).addClass("active");
+
+    // 過濾器點擊事件
+    $(".filters_menu li").click(function() {
+        const filter = $(this).attr("data-filter");
+        console.log("filter",filter)
+        // 構建新的 URL
+        let newUrl = new URL(window.location.href);
+        let searchParams = new URLSearchParams(newUrl.search);
+
+        // 更新或移除 filter 參數
+        if (filter === '*') {
+            searchParams.delete('filter');
+        } else {
+            searchParams.set('filter', filter);
+        }
+
+        // 重置頁碼
+        searchParams.set('page', '1');
+
+        // 保留 category 參數（如果存在）
+        if (!searchParams.has('category') && urlParams.has('category')) {
+            searchParams.set('category', urlParams.get('category'));
+        }
+
+        // 更新 URL 並重新載入頁面
+        newUrl.search = searchParams.toString();
+        window.location.href = newUrl.toString();
+    });
+});

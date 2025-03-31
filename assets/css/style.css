@@ -523,3 +523,46 @@ dt, dd {
 .footer-info p a {
     color: inherit;
 }
+
+/* 分頁導航樣式 */
+.pagination-container {
+    margin-top: 40px;
+    margin-bottom: 20px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    padding: 0;
+}
+
+.pagination .page-item {
+    margin: 0 4px;
+}
+
+.pagination .page-link {
+    color: #333;
+    padding: 8px 16px;
+    text-decoration: none;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.pagination .page-link:hover {
+    background-color: #f8f9fa;
+    color: #007bff;
+    border-color: #007bff;
+}
+
+.pagination .page-item:first-child .page-link,
+.pagination .page-item:last-child .page-link {
+    padding: 8px 12px;
+}

@@ -2,6 +2,10 @@
 require_once 'cms-admin/config/database.php';
 $categories_sql = "SELECT * FROM lecture_categories WHERE is_visible = 1 ORDER BY sort_order ASC";
 $categories_result = $conn->query($categories_sql);
+
+$items_per_page = 5; // 每頁顯示5個講座
+$current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1; // 當前頁碼
+$offset = ($current_page - 1) * $items_per_page; // 計算偏移量
 ?>
 <!DOCTYPE html>
 <html lang="zh-TW">
@@ -150,34 +154,64 @@ $categories_result = $conn->query($categories_sql);
             <div class="filters-content">
                 <div class="row grid">
                     <?php
+                    // 在處理 WHERE 條件的部分（約在第 190 行附近）修改為：
                     $where = '';
                     $params = [];
                     $types = '';
 
-
+                    // 處理分類過濾
                     if(isset($_GET['category'])) {
                         $where = 'WHERE c.slug = ?';
                         $params[] = $_GET['category'];
                         $types .= 's';
                     }
 
+                    // 處理狀態過濾
+                    $filter = isset($_GET['filter']) ? $_GET['filter'] : '*';
+                    if ($filter === '.coming') {
+                        $where .= ($where ? ' AND ' : 'WHERE ') . 'l.status = "coming"';
+                    } elseif ($filter === '.passed') {
+                        $where .= ($where ? ' AND ' : 'WHERE ') . 'l.status = "passed"';
+                    }
+
+                    // 計算總記錄數的 SQL
+                    $count_sql = "SELECT COUNT(*) as total FROM lectures l 
+              LEFT JOIN lecture_categories c ON l.category_id = c.id 
+              $where";
+
+                    $count_stmt = $conn->prepare($count_sql);
+                    if(!empty($params)) {
+                        $count_stmt->bind_param($types, ...$params);
+                    }
+                    $count_stmt->execute();
+                    $total_records = $count_stmt->get_result()->fetch_assoc()['total'];
+                    $total_pages = ceil($total_records / $items_per_page);
+
+                    // 修改主要查詢加入 LIMIT 和 OFFSET
+                    // 主要查詢 SQL
                     $sql = "SELECT l.*, c.name as category_name 
-FROM lectures l 
-LEFT JOIN lecture_categories c ON l.category_id = c.id 
-$where 
-ORDER BY 
-    CASE 
-        WHEN l.status = 'coming' THEN 1 
-        ELSE 2 
-    END,
-    CASE 
-        WHEN l.status = 'coming' THEN l.lecture_date
-        ELSE NULL
-    END ASC,
-    CASE 
-        WHEN l.status != 'coming' THEN l.lecture_date
-        ELSE NULL
-    END DESC";
+                        FROM lectures l 
+                        LEFT JOIN lecture_categories c ON l.category_id = c.id 
+                        $where 
+                        ORDER BY 
+                            CASE 
+                                WHEN l.status = 'coming' THEN 1 
+                                ELSE 2 
+                            END,
+                            CASE 
+                                WHEN l.status = 'coming' THEN l.lecture_date
+                                ELSE NULL
+                            END ASC,
+                            CASE 
+                                WHEN l.status != 'coming' THEN l.lecture_date
+                                ELSE NULL
+                            END DESC
+                        LIMIT ? OFFSET ?";
+
+                    // 添加分頁參數
+                    $params[] = $items_per_page;
+                    $params[] = $offset;
+                    $types .= 'ii';
 
                     $stmt = $conn->prepare($sql);
                     if(!empty($params)) {
@@ -245,8 +279,9 @@ ORDER BY
                                             </div>
                                         </div>
                                     <?php endif; ?>
-
+                                    <?php if($lecture['agenda']||$lecture['speaker_intro']||$lecture['description']||$lecture['summary']): ?>
                                     <a class="btn-box" href="lecture.php?id=<?php echo $lecture['id']; ?>">詳細資訊</a>
+                                    <?php endif; ?>
                                     <?php if($lecture['signup_url']): ?>
                                         <a class="btn-box" href="<?php echo htmlspecialchars($lecture['signup_url']); ?>" target="_blank">報名連結</a>
                                     <?php endif; ?>
@@ -257,6 +292,52 @@ ORDER BY
                             </div>
                         </div>
                     <?php endwhile; ?>
+                </div>
+                <div class="pagination-container">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            <?php
+                            // 構建基礎 URL 參數
+                            $url_params = [];
+                            if(isset($_GET['category'])) {
+                                $url_params['category'] = $_GET['category'];
+                            }
+                            if(isset($_GET['filter']) && $_GET['filter'] !== '*') {
+                                $url_params['filter'] = $_GET['filter'];
+                            }
+
+                            // 生成 URL 函數
+                            function buildPageUrl($page, $params) {
+                                $params['page'] = $page;
+                                return '?' . http_build_query($params);
+                            }
+                            ?>
+
+                            <?php if($current_page > 1): ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="<?php echo buildPageUrl($current_page - 1, $url_params); ?>" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+
+                            <?php for($i = 1; $i <= $total_pages; $i++): ?>
+                                <li class="page-item <?php echo $i === $current_page ? 'active' : ''; ?>">
+                                    <a class="page-link" href="<?php echo buildPageUrl($i, $url_params); ?>">
+                                        <?php echo $i; ?>
+                                    </a>
+                                </li>
+                            <?php endfor; ?>
+
+                            <?php if($current_page < $total_pages): ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="<?php echo buildPageUrl($current_page + 1, $url_params); ?>" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+                    </nav>
                 </div>
             </div>
         </div>
