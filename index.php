@@ -123,7 +123,7 @@ $offset = ($current_page - 1) * $items_per_page; // 計算偏移量
     </div>
 
     <!-- 講座列表 -->
-    <section class="lecture_section layout_padding-bottom">
+    <section id="lecture_section" class="lecture_section layout_padding-bottom">
         <div class="container">
             <div class="heading_wrapper">
                 <div class="heading_container">
