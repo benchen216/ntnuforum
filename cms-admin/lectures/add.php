@@ -87,6 +87,8 @@ if(isset($_POST['submit'])) {
         $online_url = $conn->real_escape_string($_POST['online_url']);
         $meeting_id = $conn->real_escape_string($_POST['meeting_id']);
         $meeting_password = $conn->real_escape_string($_POST['meeting_password']);
+        $video_url = $conn->real_escape_string($_POST['video_url']); // 新增這行
+
         // 處理講者照片上傳
         $speaker_photo = '';
         if (isset($_FILES['speaker_photo']) && $_FILES['speaker_photo']['error'] == 0) {
@@ -114,12 +116,12 @@ if(isset($_POST['submit'])) {
             organizer, organizer_en, organizer_url,
             co_organizer, co_organizer_en, co_organizer_urls,
             signup_url, signup_limit, signup_deadline,
-            online_url, meeting_id, meeting_password
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            online_url, meeting_id, meeting_password, video_url
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         // 修改參數綁定的類型，signup_limit 使用 i
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssssssssssssiissssssssssssssssissss",
+        $stmt->bind_param("ssssssssssssiissssssssssssssssisssss",
             $title, $title_en, $speaker, $speaker_en, $speaker_title, $speaker_title_en,
             $speaker_photo, $lecture_date, $lecture_time, $location, $location_en,
             $status, $category_id, $sort_order, $is_visible,
@@ -128,7 +130,7 @@ if(isset($_POST['submit'])) {
             $organizer, $organizer_en, $organizer_url,
             $co_organizer, $co_organizer_en, $co_organizer_urls,
             $signup_url, $signup_limit, $signup_deadline,
-            $online_url, $meeting_id, $meeting_password
+            $online_url, $meeting_id, $meeting_password, $video_url
         );
 
         if($stmt->execute()) {
@@ -477,6 +479,20 @@ require_once '../includes/header.php';
                                     <label class="form-label">會議密碼</label>
                                     <input type="text" name="meeting_password" class="form-control">
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h4 class="mb-0">影片回放連結</h4>
+                        </div>
+                        <div class="card-body">
+
+                            <!-- 新增影片連結欄位 -->
+                            <div class="mb-3">
+                                <label class="form-label">講座影片連結</label>
+                                <input type="url" name="video_url" class="form-control" placeholder="例：https://www.youtube.com/watch?v=...">
+                                <small class="text-muted">請輸入完整的影片網址</small>
                             </div>
                         </div>
                     </div>

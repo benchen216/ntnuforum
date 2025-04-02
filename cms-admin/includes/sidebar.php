@@ -8,7 +8,7 @@
 <!--                </a>-->
 <!--            </li>-->
             <li class="nav-item">
-                <a class="nav-link" href="/series_lecture/cms-admin/index.php">
+                <a class="nav-link" href="/series_lecture/cms-admin/lectures/index.php">
                     <i class="bi bi-calendar-event"></i>
                     講座管理+儀表板
                 </a>

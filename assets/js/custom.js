@@ -145,6 +145,6 @@ $(document).ready(function() {
 
         // 更新 URL 並重新載入頁面
         newUrl.search = searchParams.toString();
-        window.location.href = newUrl.toString()+"/#lecture_section";
+        window.location.href = newUrl.toString().replace('#lecture_section','')+"/#lecture_section";
     });
 });

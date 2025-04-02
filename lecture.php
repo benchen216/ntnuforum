@@ -182,11 +182,33 @@ $categories_result = $conn->query($categories_sql);
                                     </div>
                                 <?php endif; ?>
 
-                                <?php if($lecture['signup_url']): ?>
-                                    <a class="btn-box" href="<?php echo htmlspecialchars($lecture['signup_url']); ?>" target="_blank">報名連結</a>
-                                <?php endif; ?>
+                                <?php
+                                // 檢查是否有報名連結且報名時間未截止
+                                if($lecture['signup_url']):
+                                    $show_signup = true;
+
+                                    // 如果有設定報名截止時間，檢查是否已過期
+                                    if($lecture['signup_deadline']) {
+                                        $deadline = new DateTime($lecture['signup_deadline']);
+                                        $now = new DateTime();
+                                        if($now > $deadline) {
+                                            $show_signup = false;
+                                        }
+                                    }
+
+                                    // 只有在未截止時才顯示報名連結
+                                    if($show_signup):
+                                        ?>
+                                        <a class="btn-box" href="<?php echo htmlspecialchars($lecture['signup_url']); ?>" target="_blank">報名連結</a>
+                                    <?php
+                                    endif;
+                                endif;
+                                ?>
                                 <?php if($lecture['online_url']): ?>
                                     <a class="btn-box" href="<?php echo htmlspecialchars($lecture['online_url']); ?>" target="_blank">線上講座連結</a>
+                                <?php endif; ?>
+                                <?php if($lecture['video_url']): ?>
+                                    <a class="btn-box" href="<?php echo htmlspecialchars($lecture['video_url']); ?>" target="_blank">講座回放</a>
                                 <?php endif; ?>
                             </div>
                         </div>

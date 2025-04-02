@@ -68,7 +68,7 @@ CREATE TABLE `lectures` (
                             `online_url` varchar(255) DEFAULT NULL COMMENT '線上講座連結',
                             `meeting_id` varchar(100) DEFAULT NULL COMMENT '會議ID',
                             `meeting_password` varchar(100) DEFAULT NULL COMMENT '會議密碼',
-
+                            `video_url` varchar(255) DEFAULT NULL COMMENT '講座影片連結',
     -- 其他
                             `detail_url` varchar(255) DEFAULT NULL COMMENT '詳細資訊連結',
                             `sort_order` int(11) DEFAULT 0 COMMENT '排序順序',

@@ -112,6 +112,7 @@ if(isset($_POST['submit'])) {
         $online_url = $conn->real_escape_string($_POST['online_url']);
         $meeting_id = $conn->real_escape_string($_POST['meeting_id']);
         $meeting_password = $conn->real_escape_string($_POST['meeting_password']);
+        $video_url = $conn->real_escape_string($_POST['video_url']); // 新增這行
 
         // 處理講者照片上傳
         $speaker_photo = $lecture['speaker_photo'];
@@ -141,12 +142,12 @@ if(isset($_POST['submit'])) {
         organizer=?, organizer_en=?, organizer_url=?,
         co_organizer=?, co_organizer_en=?, co_organizer_urls=?,
         signup_url=?, signup_limit=?, signup_deadline=?,
-        online_url=?, meeting_id=?, meeting_password=?
+        online_url=?, meeting_id=?, meeting_password=?, video_url=?
         WHERE id=?";
 
         // 修改參數綁定類型，使其與 add.php 一致
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssssssssssssiissssssssssssssssissssi",
+        $stmt->bind_param("ssssssssssssiissssssssssssssssisssssi",
             $title, $title_en, $speaker, $speaker_en,
             $speaker_title, $speaker_title_en, $speaker_photo,
             $lecture_date, $lecture_time, $location, $location_en,
@@ -156,7 +157,7 @@ if(isset($_POST['submit'])) {
             $organizer, $organizer_en, $organizer_url,
             $co_organizer, $co_organizer_en, $co_organizer_urls,
             $signup_url, $signup_limit, $signup_deadline,
-            $online_url, $meeting_id, $meeting_password,
+            $online_url, $meeting_id, $meeting_password,$video_url,
             $id
         );
 
@@ -546,6 +547,20 @@ require_once '../includes/header.php';
                                     <input type="text" name="meeting_password" class="form-control"
                                            value="<?php echo htmlspecialchars($lecture['meeting_password']); ?>">
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h4 class="mb-0">影片回放連結</h4>
+                        </div>
+                        <div class="card-body">
+
+                            <!-- 新增影片連結欄位 -->
+                            <div class="mb-3">
+                                <label class="form-label">講座影片連結</label>
+                                <input type="url" name="video_url" class="form-control" placeholder="例：https://www.youtube.com/watch?v=...">
+                                <small class="text-muted">請輸入完整的影片網址</small>
                             </div>
                         </div>
                     </div>
