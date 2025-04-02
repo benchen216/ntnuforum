@@ -89,3 +89,13 @@ CREATE TABLE `users` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `website_settings` (
+                                    `page_title` varchar(255) DEFAULT NULL COMMENT '頁面標題(中文)',
+                                    `page_title_en` varchar(255) DEFAULT NULL COMMENT '頁面標題(英文)',
+                                    `meta_description` text DEFAULT NULL COMMENT 'Meta描述(中文)',
+                                    `meta_description_en` text DEFAULT NULL COMMENT 'Meta描述(英文)',
+                                    `copyright_text` text DEFAULT NULL COMMENT '版權聲明(中文)',
+                                    `copyright_text_en` text DEFAULT NULL COMMENT '版權聲明(英文)',
+                                    `sw_english` tinyint(1) DEFAULT 0 COMMENT '是否顯示英文版'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

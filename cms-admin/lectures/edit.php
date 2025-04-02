@@ -311,7 +311,7 @@ require_once '../includes/header.php';
                                     </div>
                                 <?php endif; ?>
                                 <input type="file" name="speaker_photo" class="form-control" accept="image/*">
-                                <small class="text-muted">若不更換照片請留空</small>
+                                <small class="text-muted">圖片大小最大5mb，圖片尺寸500x500，若不更換照片請留空</small>
                             </div>
                         </div>
                     </div>
@@ -401,18 +401,6 @@ require_once '../includes/header.php';
                             <h4 class="mb-0">內容描述</h4>
                         </div>
                         <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-12 mb-3">
-                                    <label class="form-label">講座描述(中文) - html輸入客製化內容</label>
-                                    <textarea name="description" class="form-control tinymce-editor" rows="4"><?php echo htmlspecialchars($lecture['description']); ?></textarea>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12 mb-3">
-                                    <label class="form-label">講座描述(英文) - html輸入客製化內容</label>
-                                    <textarea name="description_en" class="form-control tinymce-editor" rows="4"><?php echo htmlspecialchars($lecture['description_en']); ?></textarea>
-                                </div>
-                            </div>
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">
@@ -446,6 +434,18 @@ require_once '../includes/header.php';
                                     <textarea name="speaker_intro_en" class="form-control" rows="4"><?php echo htmlspecialchars($lecture['speaker_intro_en']); ?></textarea>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label">其他補充資訊(中文) - html輸入客製化內容</label>
+                                    <textarea name="description" class="form-control tinymce-editor" rows="4"><?php echo htmlspecialchars($lecture['description']); ?></textarea>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label">其他補充資訊(英文) - html輸入客製化內容</label>
+                                    <textarea name="description_en" class="form-control tinymce-editor" rows="4"><?php echo htmlspecialchars($lecture['description_en']); ?></textarea>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -460,11 +460,13 @@ require_once '../includes/header.php';
                                     <label class="form-label">主辦單位(中文)</label>
                                     <input type="text" name="organizer" class="form-control" required
                                            value="<?php echo htmlspecialchars($lecture['organizer']); ?>">
+                                    <small>每個單位間需换行</small>
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">主辦單位(英文)</label>
                                     <input type="text" name="organizer_en" class="form-control" required
                                            value="<?php echo htmlspecialchars($lecture['organizer_en']); ?>">
+                                    <small>每個單位間需换行</small>
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">主辦單位網址</label>
@@ -476,18 +478,18 @@ require_once '../includes/header.php';
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">協辦單位(中文)</label>
-                                    <textarea name="co_organizer" class="form-control" rows="3"><?php echo htmlspecialchars($lecture['co_organizer']); ?></textarea>
+                                    <textarea name="co_organizer" class="form-control" rows="3" placeholder="國立臺灣師範大學理學院&#10;天文與重力中心"><?php echo htmlspecialchars($lecture['co_organizer']); ?></textarea>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">協辦單位(英文)</label>
-                                    <textarea name="co_organizer_en" class="form-control" rows="3"><?php echo htmlspecialchars($lecture['co_organizer_en']); ?></textarea>
+                                    <textarea name="co_organizer_en" class="form-control" rows="3" placeholder="College of Science, National Taiwan Normal University&#10;Center for Astronomy and Gravity"><?php echo htmlspecialchars($lecture['co_organizer_en']); ?></textarea>
                                 </div>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">協辦單位網址</label>
-                                <textarea name="co_organizer_urls" class="form-control" rows="3"><?php echo htmlspecialchars($lecture['co_organizer_urls']); ?></textarea>
-                                <small class="text-muted">每行一個網址</small>
+                                <textarea name="co_organizer_urls" class="form-control" rows="3" placeholder="https://www.ntnu.edu.tw/&#10;https://www.cos.ntnu.edu.tw/"><?php echo htmlspecialchars($lecture['co_organizer_urls']); ?></textarea>
+                                <small class="text-muted">對應協辦單位順序，每行一個網址</small>
                             </div>
                         </div>
                     </div>

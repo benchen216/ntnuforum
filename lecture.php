@@ -1,6 +1,11 @@
 <?php
 require_once 'cms-admin/config/database.php';
 
+// 獲取網站設定
+$settings_sql = "SELECT * FROM website_settings LIMIT 1";
+$settings_result = $conn->query($settings_sql);
+$settings = $settings_result->fetch_assoc();
+
 // 檢查是否有講座ID
 if(!isset($_GET['id'])) {
     header('Location: index.php');
@@ -241,9 +246,7 @@ $categories_result = $conn->query($categories_sql);
                 <img src="assets/img/logo-white.svg" alt="LOGO">
             </div>
             <div class="footer-contact">
-                <p>電話：02-7749-1324</p>
-                <p>Email：friend29@ntnu.edu.tw</p>
-                <p>地址：106308台北市大安區和平東路一段162號</p>
+                <?php echo $settings['copyright_text']?? '' ; ?>
             </div>
         </div>
         <div class="footer-info">
