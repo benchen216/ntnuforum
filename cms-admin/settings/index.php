@@ -17,8 +17,8 @@ if(isset($_POST['submit'])) {
     $page_title_en = $conn->real_escape_string($_POST['page_title_en']);
     $meta_description = $conn->real_escape_string($_POST['meta_description']);
     $meta_description_en = $conn->real_escape_string($_POST['meta_description_en']);
-    $copyright_text = $conn->real_escape_string($_POST['copyright_text']);
-    $copyright_text_en = $conn->real_escape_string($_POST['copyright_text_en']);
+    $copyright_text = str_replace(["\r\n", "\r"], "\n",$_POST['copyright_text']);
+    $copyright_text_en = str_replace(["\r\n", "\r"], "\n",$_POST['copyright_text_en']);
     $sw_english = isset($_POST['sw_english']) ? 1 : 0;
 
     // 如果已有記錄則更新，否則插入
@@ -51,7 +51,7 @@ if(isset($_POST['submit'])) {
 
     if($stmt->execute()) {
         $_SESSION['message'] = "網站設定已更新成功！";
-        header('Location: edit.php');
+        header('Location: index.php');
         exit();
     } else {
         $error = "發生錯誤，請稍後再試。";

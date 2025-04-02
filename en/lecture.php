@@ -236,9 +236,7 @@ $categories_result = $conn->query($categories_sql);
                 <img src="../assets/img/logo-white.svg" alt="LOGO">
             </div>
             <div class="footer-contact">
-                <p>Tel: 02-7749-1324</p>
-                <p>Email: friend29@ntnu.edu.tw</p>
-                <p>Address: No. 162, Sec. 1, Heping E. Rd., Da'an Dist., Taipei City 106308, Taiwan (R.O.C.)</p>
+                <?php echo $settings['copyright_text_en']?? '' ; ?>
             </div>
         </div>
         <div class="footer-info">

@@ -1,5 +1,10 @@
 <?php
 require_once '../cms-admin/config/database.php';
+// 獲取網站設定
+$settings_sql = "SELECT * FROM website_settings LIMIT 1";
+$settings_result = $conn->query($settings_sql);
+$settings = $settings_result->fetch_assoc();
+
 $categories_sql = "SELECT * FROM lecture_categories WHERE is_visible = 1 ORDER BY sort_order ASC";
 $categories_result = $conn->query($categories_sql);
 ?>
@@ -8,8 +13,8 @@ $categories_result = $conn->query($categories_sql);
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>National Taiwan Normal University | Distinguished International Scholar Lecture Series</title>
-    <meta name="description" content="">
+    <title><?php echo htmlspecialchars($settings['page_title_en'] ?? 'National Taiwan Normal University | Distinguished International Scholar Lecture Series'); ?></title>
+    <meta name="description" content="<?php echo htmlspecialchars($settings['meta_description_en'] ?? ''); ?>">
     <meta name="keywords" content="">
     <!-- Favicons -->
     <link href="../assets/img/favicon.png" rel="icon">
@@ -262,9 +267,7 @@ ORDER BY
                 <img src="../assets/img/logo-white.svg" alt="LOGO">
             </div>
             <div class="footer-contact">
-                <p>Tel: 02-7749-1324</p>
-                <p>Email: friend29@ntnu.edu.tw</p>
-                <p>Address: No. 162, Sec. 1, Heping E. Rd., Da'an Dist., Taipei City 106308, Taiwan (R.O.C.)</p>
+                <?php echo $settings['copyright_text_en']?? '' ; ?>
             </div>
         </div>
         <div class="footer-info">

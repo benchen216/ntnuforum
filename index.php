@@ -1,5 +1,11 @@
 <?php
 require_once 'cms-admin/config/database.php';
+
+// 獲取網站設定
+$settings_sql = "SELECT * FROM website_settings LIMIT 1";
+$settings_result = $conn->query($settings_sql);
+$settings = $settings_result->fetch_assoc();
+
 $categories_sql = "SELECT * FROM lecture_categories WHERE is_visible = 1 ORDER BY sort_order ASC";
 $categories_result = $conn->query($categories_sql);
 
@@ -12,8 +18,8 @@ $offset = ($current_page - 1) * $items_per_page; // 計算偏移量
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>國立臺灣師範大學｜國際頂尖學者系列講座</title>
-    <meta name="description" content="">
+    <title><?php echo htmlspecialchars($settings['page_title'] ?? '國立臺灣師範大學｜國際頂尖學者系列講座'); ?></title>
+    <meta name="description" content="<?php echo htmlspecialchars($settings['meta_description'] ?? ''); ?>">
     <meta name="keywords" content="">
     <!-- Favicons -->
     <link href="assets/img/favicon.png" rel="icon">
@@ -352,9 +358,7 @@ $offset = ($current_page - 1) * $items_per_page; // 計算偏移量
                 <img src="assets/img/logo-white.svg" alt="LOGO">
             </div>
             <div class="footer-contact">
-                <p>電話：02-7749-1324</p>
-                <p>Email：friend29@ntnu.edu.tw</p>
-                <p>地址：106308台北市大安區和平東路一段162號</p>
+                <?php echo $settings['copyright_text']?? '' ; ?>
             </div>
         </div>
         <div class="footer-info">
