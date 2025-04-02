@@ -25,6 +25,12 @@
                     使用者管理
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/series_lecture/cms-admin/settings/edit.php">
+                    <i class="bi bi-diagram-2"></i>
+                    網站資料編輯
+                </a>
+            </li>
         </ul>
     </div>
 </nav>

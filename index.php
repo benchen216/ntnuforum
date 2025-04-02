@@ -63,7 +63,7 @@ $offset = ($current_page - 1) * $items_per_page; // 計算偏移量
                             $categories_result->data_seek(0);
                             while($category = $categories_result->fetch_assoc()): ?>
                                 <li><a href="index.php?category=<?php echo htmlspecialchars($category['slug']); ?>">
-                                        <?php echo htmlspecialchars($category['name']); ?>系列
+                                        <?php echo htmlspecialchars($category['name']); ?>
                                     </a></li>
                             <?php endwhile; ?>
                         </ul>
