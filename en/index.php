@@ -1,12 +1,17 @@
 <?php
 require_once '../cms-admin/config/database.php';
-// 獲取網站設定
+
+// Get website settings
 $settings_sql = "SELECT * FROM website_settings LIMIT 1";
 $settings_result = $conn->query($settings_sql);
 $settings = $settings_result->fetch_assoc();
 
 $categories_sql = "SELECT * FROM lecture_categories WHERE is_visible = 1 ORDER BY sort_order ASC";
 $categories_result = $conn->query($categories_sql);
+
+$items_per_page = 5; // Items per page
+$current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1; // Current page
+$offset = ($current_page - 1) * $items_per_page; // Calculate offset
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -74,41 +79,34 @@ $categories_result = $conn->query($categories_sql);
             <?php
             if(isset($_GET['category'])) {
                 $category_slug = $_GET['category'];
-                $banner_image = 'detail.jpg'; // 預設圖片
-                // 檢查是否有對應的 banner 圖片
-                if(file_exists("assets/img/banner/{$category_slug}.jpg")) {
+                $banner_image = 'detail.jpg'; // Default image
+                // Check if category banner exists
+                if(file_exists("../assets/img/banner/{$category_slug}.jpg")) {
                     $banner_image = $category_slug . '.jpg';
                 }
                 ?>
-                <img src="assets/img/banner/<?php echo $banner_image; ?>" alt="Banner Image" class="lecture-image">
+                <img src="../assets/img/banner/<?php echo $banner_image; ?>" alt="Banner Image" class="lecture-image">
             <?php } else { ?>
-                <div id="carouselIndicators" class="carousel slide" data-bs-ride="carousel">
-                    <div id="hero-carousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
-                        <div class="carousel-inner">
-                            <!-- 一張圖 -->
-                            <div class="carousel-item active">
-                                <img src="assets/img/carousel/carousel-1.jpg" class="d-block w-100" alt="">
-                            </div><!-- End 一張圖 -->
-                            <!-- 一張圖 -->
-                            <div class="carousel-item">
-                                <img src="../assets/img/carousel/carousel-2.jpg" class="d-block w-100" alt="">
-                            </div><!-- End 一張圖 -->
+                <div id="hero-carousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <img src="../assets/img/carousel/carousel-1.jpg" class="d-block w-100" alt="">
                         </div>
-                        <!-- 左箭頭 -->
-                        <a class="carousel-control-prev" href="#hero-carousel" role="button" data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Previous</span>
-                        </a>
-                        <!-- 右箭頭 -->
-                        <a class="carousel-control-next" href="#hero-carousel" role="button" data-bs-slide="next">
-                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Next</span>
-                        </a>
-                        <!-- 下方點點選單 (只顯示兩個點) -->
-                        <div class="carousel-indicators">
-<!--                            <button type="button" data-bs-target="#hero-carousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>-->
-<!--                            <button type="button" data-bs-target="#hero-carousel" data-bs-slide-to="1" aria-label="Slide 2"></button>-->
+                        <div class="carousel-item">
+                            <img src="../assets/img/carousel/carousel-2.jpg" class="d-block w-100" alt="">
                         </div>
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#hero-carousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#hero-carousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                    <div class="carousel-indicators">
+<!--                        <button type="button" data-bs-target="#hero-carousel" data-bs-slide-to="0" class="active" aria-current="true"></button>-->
+<!--                        <button type="button" data-bs-target="#hero-carousel" data-bs-slide-to="1"></button>-->
                     </div>
                 </div>
             <?php } ?>
@@ -116,7 +114,7 @@ $categories_result = $conn->query($categories_sql);
     </div>
 
     <!-- Lecture List -->
-    <section class="lecture_section layout_padding-bottom">
+    <section id="lecture_section" class="lecture_section layout_padding-bottom">
         <div class="container">
             <div class="heading_wrapper">
                 <div class="heading_container">
@@ -124,7 +122,6 @@ $categories_result = $conn->query($categories_sql);
                         Distinguished International Scholar
                         <?php
                         if(isset($_GET['category'])) {
-                            // 重置結果指標
                             $categories_result->data_seek(0);
                             while($category = $categories_result->fetch_assoc()) {
                                 if($category['slug'] === $_GET['category']) {
@@ -151,29 +148,58 @@ $categories_result = $conn->query($categories_sql);
                     $params = [];
                     $types = '';
 
+                    // Handle category filter
                     if(isset($_GET['category'])) {
                         $where = 'WHERE c.slug = ?';
                         $params[] = $_GET['category'];
                         $types .= 's';
                     }
 
+                    // Handle status filter
+                    $filter = isset($_GET['filter']) ? $_GET['filter'] : '*';
+                    if ($filter === '.coming') {
+                        $where .= ($where ? ' AND ' : 'WHERE ') . 'l.status = "coming"';
+                    } elseif ($filter === '.passed') {
+                        $where .= ($where ? ' AND ' : 'WHERE ') . 'l.status = "passed"';
+                    }
+
+                    // Count total records
+                    $count_sql = "SELECT COUNT(*) as total FROM lectures l 
+                                LEFT JOIN lecture_categories c ON l.category_id = c.id 
+                                $where";
+
+                    $count_stmt = $conn->prepare($count_sql);
+                    if(!empty($params)) {
+                        $count_stmt->bind_param($types, ...$params);
+                    }
+                    $count_stmt->execute();
+                    $total_records = $count_stmt->get_result()->fetch_assoc()['total'];
+                    $total_pages = ceil($total_records / $items_per_page);
+
+                    // Main query with pagination
                     $sql = "SELECT l.*, c.name_en as category_name 
-FROM lectures l 
-LEFT JOIN lecture_categories c ON l.category_id = c.id 
-$where 
-ORDER BY 
-    CASE 
-        WHEN l.status = 'coming' THEN 1 
-        ELSE 2 
-    END,
-    CASE 
-        WHEN l.status = 'coming' THEN l.lecture_date
-        ELSE NULL
-    END ASC,
-    CASE 
-        WHEN l.status != 'coming' THEN l.lecture_date
-        ELSE NULL
-    END DESC";
+                           FROM lectures l 
+                           LEFT JOIN lecture_categories c ON l.category_id = c.id 
+                           $where 
+                           ORDER BY 
+                               CASE 
+                                   WHEN l.status = 'coming' THEN 1 
+                                   ELSE 2 
+                               END,
+                               CASE 
+                                   WHEN l.status = 'coming' THEN l.lecture_date
+                                   ELSE NULL
+                               END ASC,
+                               CASE 
+                                   WHEN l.status != 'coming' THEN l.lecture_date
+                                   ELSE NULL
+                               END DESC
+                           LIMIT ? OFFSET ?";
+
+                    // Add pagination parameters
+                    $params[] = $items_per_page;
+                    $params[] = $offset;
+                    $types .= 'ii';
 
                     $stmt = $conn->prepare($sql);
                     if(!empty($params)) {
@@ -189,7 +215,8 @@ ORDER BY
                             <div class="col-lg-4 col-sm-6">
                                 <div class="img-box">
                                     <?php if($lecture['speaker_photo']): ?>
-                                        <img src="../assets/img/speakers/<?php echo htmlspecialchars($lecture['speaker_photo']); ?>" alt="<?php echo htmlspecialchars($lecture['speaker_en']); ?>">
+                                        <img src="../assets/img/speakers/<?php echo htmlspecialchars($lecture['speaker_photo']); ?>"
+                                             alt="<?php echo htmlspecialchars($lecture['speaker_en']); ?>">
                                     <?php else: ?>
                                         <img src="../assets/img/avatar.png" alt="Default Avatar">
                                     <?php endif; ?>
@@ -220,11 +247,24 @@ ORDER BY
                                         <span class="sponsors-title">Organizer |</span>
                                         <div class="sponsors-links">
                                             <?php
-                                            $organizers = explode("\n", $lecture['organizer_en']);
-                                            foreach($organizers as $org):
-                                                ?>
-                                                <a href="#" target="_blank"><?php echo htmlspecialchars($org); ?></a>
-                                            <?php endforeach; ?>
+                                            $organizers = array_map('trim', explode("\n", $lecture['organizer_en']));
+                                            $organizer_urls = array_map('trim', explode("\n", $lecture['organizer_url']));
+                                            foreach($organizers as $index => $org):
+                                                $org = trim($org);
+                                                if(empty($org)) continue;
+                                                $url = isset($organizer_urls[$index]) ? trim($organizer_urls[$index]) : '';
+                                                if($url): ?>
+                                                    <div class="sponsor-item">
+                                                        <a href="<?php echo htmlspecialchars($url); ?>" target="_blank">
+                                                            <?php echo htmlspecialchars($org); ?>
+                                                        </a>
+                                                    </div>
+                                                <?php else: ?>
+                                                    <div class="sponsor-item">
+                                                        <?php echo htmlspecialchars($org); ?>
+                                                    </div>
+                                                <?php endif;
+                                            endforeach; ?>
                                         </div>
                                     </div>
 
@@ -233,26 +273,104 @@ ORDER BY
                                             <span class="sponsors-title">Co-organizer |</span>
                                             <div class="sponsors-links">
                                                 <?php
-                                                $co_organizers = explode("\n", $lecture['co_organizer_en']);
-                                                foreach($co_organizers as $co_org):
-                                                    ?>
-                                                    <a href="#" target="_blank"><?php echo htmlspecialchars($co_org); ?></a>
-                                                <?php endforeach; ?>
+                                                $co_organizers = array_map('trim', explode("\n", $lecture['co_organizer_en']));
+                                                $co_organizer_urls = array_map('trim', explode("\n", $lecture['co_organizer_urls']));
+                                                foreach($co_organizers as $index => $co_org):
+                                                    $co_org = trim($co_org);
+                                                    if(empty($co_org)) continue;
+                                                    $url = isset($co_organizer_urls[$index]) ? trim($co_organizer_urls[$index]) : '';
+                                                    if($url): ?>
+                                                        <div class="sponsor-item">
+                                                            <a href="<?php echo htmlspecialchars($url); ?>" target="_blank">
+                                                                <?php echo htmlspecialchars($co_org); ?>
+                                                            </a>
+                                                        </div>
+                                                    <?php else: ?>
+                                                        <div class="sponsor-item">
+                                                            <?php echo htmlspecialchars($co_org); ?>
+                                                        </div>
+                                                    <?php endif;
+                                                endforeach; ?>
                                             </div>
                                         </div>
                                     <?php endif; ?>
 
-                                    <a class="btn-box" href="lecture.php?id=<?php echo $lecture['id']; ?>">Details</a>
-                                    <?php if($lecture['signup_url']): ?>
-                                        <a class="btn-box" href="<?php echo htmlspecialchars($lecture['signup_url']); ?>" target="_blank">Registration</a>
+                                    <?php if($lecture['agenda_en']||$lecture['speaker_intro_en']||$lecture['description_en']||$lecture['summary_en']): ?>
+                                        <a class="btn-box" href="lecture.php?id=<?php echo $lecture['id']; ?>">Details</a>
                                     <?php endif; ?>
+
+                                    <?php
+                                    if($lecture['signup_url']):
+                                        $show_signup = true;
+                                        if($lecture['signup_deadline']) {
+                                            $deadline = new DateTime($lecture['signup_deadline']);
+                                            $now = new DateTime();
+                                            if($now > $deadline) {
+                                                $show_signup = false;
+                                            }
+                                        }
+                                        if($show_signup): ?>
+                                            <a class="btn-box" href="<?php echo htmlspecialchars($lecture['signup_url']); ?>" target="_blank">Registration</a>
+                                        <?php endif;
+                                    endif; ?>
+
                                     <?php if($lecture['online_url']): ?>
                                         <a class="btn-box" href="<?php echo htmlspecialchars($lecture['online_url']); ?>" target="_blank">Online Lecture Link</a>
+                                    <?php endif; ?>
+
+                                    <?php if($lecture['video_url']): ?>
+                                        <a class="btn-box" href="<?php echo htmlspecialchars($lecture['video_url']); ?>" target="_blank">Lecture Recording</a>
                                     <?php endif; ?>
                                 </div>
                             </div>
                         </div>
                     <?php endwhile; ?>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination-container">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            <?php
+                            $url_params = [];
+                            if(isset($_GET['category'])) {
+                                $url_params['category'] = $_GET['category'];
+                            }
+                            if(isset($_GET['filter']) && $_GET['filter'] !== '*') {
+                                $url_params['filter'] = $_GET['filter'];
+                            }
+
+                            function buildPageUrl($page, $params) {
+                                $params['page'] = $page;
+                                return '?' . http_build_query($params);
+                            }
+                            ?>
+
+                            <?php if($current_page > 1): ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="<?php echo buildPageUrl($current_page - 1, $url_params); ?>" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+
+                            <?php for($i = 1; $i <= $total_pages; $i++): ?>
+                                <li class="page-item <?php echo $i === $current_page ? 'active' : ''; ?>">
+                                    <a class="page-link" href="<?php echo buildPageUrl($i, $url_params); ?>">
+                                        <?php echo $i; ?>
+                                    </a>
+                                </li>
+                            <?php endfor; ?>
+
+                            <?php if($current_page < $total_pages): ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="<?php echo buildPageUrl($current_page + 1, $url_params); ?>" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+                    </nav>
                 </div>
             </div>
         </div>

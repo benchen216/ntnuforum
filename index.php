@@ -120,8 +120,8 @@ $offset = ($current_page - 1) * $items_per_page; // 計算偏移量
                     </button>
                     <!-- 下方點點選單 -->
                     <div class="carousel-indicators">
-<!--                        <button type="button" data-bs-target="#hero-carousel" data-bs-slide-to="0" class="active" aria-current="true"></button>-->
-<!--                        <button type="button" data-bs-target="#hero-carousel" data-bs-slide-to="1"></button>-->
+                        <button type="button" data-bs-target="#hero-carousel" data-bs-slide-to="0" class="active" aria-current="true"></button>
+                        <button type="button" data-bs-target="#hero-carousel" data-bs-slide-to="1"></button>
                     </div>
                 </div>
             <?php } ?>
@@ -264,11 +264,26 @@ $offset = ($current_page - 1) * $items_per_page; // 計算偏移量
                                         <span class="sponsors-title">主辦單位｜</span>
                                         <div class="sponsors-links">
                                             <?php
-                                            $organizers = explode("\n", $lecture['organizer']);
-                                            foreach($organizers as $org):
-                                                ?>
-                                                <a href="#" target="_blank"><?php echo htmlspecialchars($org); ?></a>
-                                            <?php endforeach; ?>
+                                            $organizers = array_map('trim', explode("\n", $lecture['organizer']));
+                                            $organizer_urls = array_map('trim', explode("\n", $lecture['organizer_url']));
+                                            foreach($organizers as $index => $org):
+                                                $org = trim($org);
+                                                if(empty($org)) continue; // 跳過空行
+                                                $url = isset($organizer_urls[$index]) ? trim($organizer_urls[$index]) : '';
+                                                if($url):
+                                                    ?>
+                                                    <div class="sponsor-item">
+                                                        <a href="<?php echo htmlspecialchars($url); ?>" target="_blank">
+                                                            <?php echo htmlspecialchars($org); ?>
+                                                        </a>
+                                                    </div>
+                                                <?php else: ?>
+                                                    <div class="sponsor-item">
+                                                        <?php echo htmlspecialchars($org); ?>
+                                                    </div>
+                                                <?php endif;
+                                            endforeach;
+                                            ?>
                                         </div>
                                     </div>
 
@@ -277,11 +292,26 @@ $offset = ($current_page - 1) * $items_per_page; // 計算偏移量
                                             <span class="sponsors-title">協辦單位｜</span>
                                             <div class="sponsors-links">
                                                 <?php
-                                                $co_organizers = explode("\n", $lecture['co_organizer']);
-                                                foreach($co_organizers as $co_org):
-                                                    ?>
-                                                    <a href="#" target="_blank"><?php echo htmlspecialchars($co_org); ?></a>
-                                                <?php endforeach; ?>
+                                                $co_organizers = array_map('trim', explode("\n", $lecture['co_organizer']));
+                                                $co_organizer_urls = array_map('trim', explode("\n", $lecture['co_organizer_urls']));
+                                                foreach($co_organizers as $index => $co_org):
+                                                    $co_org = trim($co_org);
+                                                    if(empty($co_org)) continue; // 跳過空行
+                                                    $url = isset($co_organizer_urls[$index]) ? trim($co_organizer_urls[$index]) : '';
+                                                    if($url):
+                                                        ?>
+                                                        <div class="sponsor-item">
+                                                            <a href="<?php echo htmlspecialchars($url); ?>" target="_blank">
+                                                                <?php echo htmlspecialchars($co_org); ?>
+                                                            </a>
+                                                        </div>
+                                                    <?php else: ?>
+                                                        <div class="sponsor-item">
+                                                            <?php echo htmlspecialchars($co_org); ?>
+                                                        </div>
+                                                    <?php endif;
+                                                endforeach;
+                                                ?>
                                             </div>
                                         </div>
                                     <?php endif; ?>

@@ -1,6 +1,11 @@
 <?php
 require_once '../cms-admin/config/database.php';
 
+// Get website settings
+$settings_sql = "SELECT * FROM website_settings LIMIT 1";
+$settings_result = $conn->query($settings_sql);
+$settings = $settings_result->fetch_assoc();
+
 // Check if lecture ID exists
 if(!isset($_GET['id'])) {
     header('Location: index.php');
@@ -177,11 +182,33 @@ $categories_result = $conn->query($categories_sql);
                                     </div>
                                 <?php endif; ?>
 
-                                <?php if($lecture['signup_url']): ?>
-                                    <a class="btn-box" href="<?php echo htmlspecialchars($lecture['signup_url']); ?>" target="_blank">Registration</a>
-                                <?php endif; ?>
+                                <?php
+                                // Check if signup URL exists and deadline hasn't passed
+                                if($lecture['signup_url']):
+                                    $show_signup = true;
+
+                                    // If signup deadline is set, check if it's passed
+                                    if($lecture['signup_deadline']) {
+                                        $deadline = new DateTime($lecture['signup_deadline']);
+                                        $now = new DateTime();
+                                        if($now > $deadline) {
+                                            $show_signup = false;
+                                        }
+                                    }
+
+                                    // Only show signup link if not past deadline
+                                    if($show_signup):
+                                        ?>
+                                        <a class="btn-box" href="<?php echo htmlspecialchars($lecture['signup_url']); ?>" target="_blank">Registration</a>
+                                    <?php
+                                    endif;
+                                endif;
+                                ?>
                                 <?php if($lecture['online_url']): ?>
                                     <a class="btn-box" href="<?php echo htmlspecialchars($lecture['online_url']); ?>" target="_blank">Online Lecture Link</a>
+                                <?php endif; ?>
+                                <?php if($lecture['video_url']): ?>
+                                    <a class="btn-box" href="<?php echo htmlspecialchars($lecture['video_url']); ?>" target="_blank">Lecture Recording</a>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -206,12 +233,16 @@ $categories_result = $conn->query($categories_sql);
 
             <?php if($lecture['agenda_en']): ?>
                 <h3>【Agenda】</h3>
-                <?php echo nl2br(htmlspecialchars($lecture['agenda_en'])); ?>
+                <div class="agenda-content">
+                    <?php
+                    $agenda = str_replace("\r\n", "\n", $lecture['agenda_en']);
+                    echo nl2br(htmlspecialchars($agenda));
+                    ?>
+                </div>
             <?php endif; ?>
 
             <?php if($lecture['description_en']): ?>
-<!--                <h3>【Lecture Description</h3>-->
-            <br>
+                <br>
                 <?php echo $lecture['description_en']; ?>
             <?php endif; ?>
 
