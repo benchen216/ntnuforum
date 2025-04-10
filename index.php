@@ -343,6 +343,9 @@ $offset = ($current_page - 1) * $items_per_page; // 計算偏移量
                                     <?php if($lecture['online_url']): ?>
                                         <a class="btn-box" href="<?php echo htmlspecialchars($lecture['online_url']); ?>" target="_blank">線上講座連結</a>
                                     <?php endif; ?>
+                                    <?php if($lecture['video_url']): ?>
+                                        <a class="btn-box" href="<?php echo htmlspecialchars($lecture['video_url']); ?>" target="_blank">講座回放</a>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>

@@ -555,11 +555,9 @@ require_once '../includes/header.php';
                             <h4 class="mb-0">影片回放連結</h4>
                         </div>
                         <div class="card-body">
-
-                            <!-- 新增影片連結欄位 -->
                             <div class="mb-3">
                                 <label class="form-label">講座影片連結</label>
-                                <input type="url" name="video_url" class="form-control" placeholder="例：https://www.youtube.com/watch?v=...">
+                                <input type="url" name="video_url" class="form-control" placeholder="例：https://www.youtube.com/watch?v=..." value="<?php echo htmlspecialchars($lecture['video_url']); ?>">
                                 <small class="text-muted">請輸入完整的影片網址</small>
                             </div>
                         </div>
