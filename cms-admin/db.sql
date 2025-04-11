@@ -100,3 +100,12 @@ CREATE TABLE `website_settings` (
                                     `sw_english` tinyint(1) DEFAULT 0 COMMENT '是否顯示英文版',
                                     `google_analytics_code` text DEFAULT NULL COMMENT 'Google Analytics Code',
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE carousel_images (
+                                 id INT PRIMARY KEY AUTO_INCREMENT,
+                                 image_path VARCHAR(255) NOT NULL,
+                                 sort_order INT DEFAULT 0,
+                                 is_visible BOOLEAN DEFAULT TRUE,
+                                 language VARCHAR(10) DEFAULT 'zh' COMMENT 'zh or en',
+                                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

@@ -103,30 +103,37 @@ $offset = ($current_page - 1) * $items_per_page; // 計算偏移量
             <?php } else { ?>
                 <div id="hero-carousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
                     <div class="carousel-inner">
-                        <!-- 一張圖 -->
-                        <div class="carousel-item active">
-                            <img src="assets/img/carousel/carousel-1.jpg" class="d-block w-100" alt="">
-                        </div>
-                        <!-- 一張圖 -->
-                        <div class="carousel-item">
-                            <img src="assets/img/carousel/carousel-2.jpg" class="d-block w-100" alt="">
-                        </div>
+                        <?php
+                        // 獲取可見的中文輪播圖片
+                        $carousel_sql = "SELECT * FROM carousel_images WHERE language = 'zh' AND is_visible = 1 ORDER BY sort_order";
+                        $carousel_result = $conn->query($carousel_sql);
+                        $first = true;
+                        while ($image = $carousel_result->fetch_assoc()):
+                            ?>
+                            <div class="carousel-item <?php echo $first ? 'active' : ''; ?>">
+                                <img src="<?php echo $image['image_path']; ?>" class="d-block w-100" alt="">
+                            </div>
+                            <?php
+                            $first = false;
+                        endwhile;
+                        ?>
                     </div>
-                    <!-- 左箭頭 -->
-                    <button class="carousel-control-prev" type="button" data-bs-target="#hero-carousel" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Previous</span>
-                    </button>
-                    <!-- 右箭頭 -->
-                    <button class="carousel-control-next" type="button" data-bs-target="#hero-carousel" data-bs-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Next</span>
-                    </button>
-                    <!-- 下方點點選單 -->
-                    <div class="carousel-indicators">
-                        <button type="button" data-bs-target="#hero-carousel" data-bs-slide-to="0" class="active" aria-current="true"></button>
-                        <button type="button" data-bs-target="#hero-carousel" data-bs-slide-to="1"></button>
-                    </div>
+                    <?php if ($carousel_result->num_rows > 1): ?>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#hero-carousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#hero-carousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                        <div class="carousel-indicators">
+                            <?php for($i = 0; $i < $carousel_result->num_rows; $i++): ?>
+                                <button type="button" data-bs-target="#hero-carousel" data-bs-slide-to="<?php echo $i; ?>"
+                                    <?php echo $i === 0 ? 'class="active" aria-current="true"' : ''; ?>></button>
+                            <?php endfor; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
             <?php } ?>
         </div>

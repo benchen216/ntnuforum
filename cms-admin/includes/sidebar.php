@@ -32,7 +32,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/series_lecture/cms-admin/home-banner/index.php">
+                <a class="nav-link" href="/series_lecture/cms-admin/carousel/index.php">
                     <i class="bi bi-diagram-2"></i>
                     首頁輪播圖片
                 </a>
