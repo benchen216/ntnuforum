@@ -128,7 +128,7 @@ $categories_result = $conn->query($categories_sql);
                                 <dl class="lecture_detail">
                                     <div class="lecture-item">
                                         <dt>講座日期｜</dt>
-                                        <dd><?php echo date('Y年m月d日', strtotime($lecture['lecture_date'])); ?></dd>
+                                        <dd><?php echo $lecture['lecture_date'] ? date('Y年m月d日', strtotime($lecture['lecture_date'])) : '待定'; ?></dd>
                                     </div>
                                     <div class="lecture-item">
                                         <dt>講座時間｜</dt>

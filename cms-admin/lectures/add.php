@@ -23,7 +23,6 @@ if(isset($_POST['submit'])) {
         'speaker_en' => '講者姓名(英文)',
         'speaker_title' => '講者頭銜(中文)',
         'speaker_title_en' => '講者頭銜(英文)',
-        'lecture_date' => '講座日期',
         'lecture_time' => '講座時間',
         'location' => '地點(中文)',
         'location_en' => '地點(英文)',
@@ -50,7 +49,7 @@ if(isset($_POST['submit'])) {
         $speaker_title_en = str_replace(["\r\n", "\r"], "\n",$_POST['speaker_title_en']);
 
         // 時間地點
-        $lecture_date = $conn->real_escape_string($_POST['lecture_date']);
+        $lecture_date = !empty($_POST['lecture_date']) ? $_POST['lecture_date'] : null;
         $lecture_time = $conn->real_escape_string($_POST['lecture_time']);
         $location = $conn->real_escape_string($_POST['location']);
         $location_en = $conn->real_escape_string($_POST['location_en']);
@@ -273,12 +272,13 @@ require_once '../includes/header.php';
                     <!-- 時間地點部分 -->
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">講座日期 <span class="text-danger">*</span></label>
-                            <input type="date" name="lecture_date" class="form-control" required>
+                            <label class="form-label">講座日期 </label>
+                            <input type="date" name="lecture_date" class="form-control" >
+                            <small>未填寫則為待定</small>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">講座時間 <span class="text-danger">*</span></label>
-                            <input type="text" name="lecture_time" class="form-control" placeholder="例：13:30-15:30" required>
+                            <input type="text" name="lecture_time" class="form-control" placeholder="例：13:30-15:30、待定" required >
                         </div>
                     </div>
 

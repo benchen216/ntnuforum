@@ -210,10 +210,12 @@ $offset = ($current_page - 1) * $items_per_page; // 計算偏移量
                             END,
                             CASE 
                                 WHEN l.status = 'coming' THEN l.lecture_date
+                                WHEN l.status = 'coming' AND l.lecture_date IS NULL THEN '9999-12-31' -- 將 null 日期排在最後
                                 ELSE NULL
                             END ASC,
                             CASE 
                                 WHEN l.status != 'coming' THEN l.lecture_date
+                                WHEN l.status != 'coming' AND l.lecture_date IS NULL THEN '0000-01-01' -- 將 null 日期排在最
                                 ELSE NULL
                             END DESC
                         LIMIT ? OFFSET ?";
@@ -252,7 +254,7 @@ $offset = ($current_page - 1) * $items_per_page; // 計算偏移量
                                     <dl class="lecture_detail">
                                         <div class="lecture-item">
                                             <dt>講座日期｜</dt>
-                                            <dd><?php echo date('Y年m月d日', strtotime($lecture['lecture_date'])); ?></dd>
+                                            <dd><?php echo $lecture['lecture_date']? date('Y年m月d日', strtotime($lecture['lecture_date'])):"待定"; ?></dd>
                                         </div>
                                         <div class="lecture-item">
                                             <dt>講座時間｜</dt>

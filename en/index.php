@@ -85,19 +85,19 @@ $offset = ($current_page - 1) * $items_per_page; // Calculate offset
                 $category_slug = $_GET['category'];
                 $banner_image = 'detail.jpg'; // Default image
                 // Check if category banner exists
-                if(file_exists("../assets/img/banner/{$category_slug}.jpg")) {
+                if(file_exists("assets/img/banner/{$category_slug}.jpg")) {
                     $banner_image = $category_slug . '.jpg';
                 }
                 ?>
-                <img src="../assets/img/banner/<?php echo $banner_image; ?>" alt="Banner Image" class="lecture-image">
+                <img src="assets/img/banner/<?php echo $banner_image; ?>" alt="Banner Image" class="lecture-image">
             <?php } else { ?>
                 <div id="hero-carousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
                     <div class="carousel-inner">
                         <div class="carousel-item active">
-                            <img src="../assets/img/carousel/carousel-1.jpg" class="d-block w-100" alt="">
+                            <img src="assets/img/carousel/carousel-1.jpg" class="d-block w-100" alt="">
                         </div>
                         <div class="carousel-item">
-                            <img src="../assets/img/carousel/carousel-2.jpg" class="d-block w-100" alt="">
+                            <img src="assets/img/carousel/carousel-2.jpg" class="d-block w-100" alt="">
                         </div>
                     </div>
                     <button class="carousel-control-prev" type="button" data-bs-target="#hero-carousel" data-bs-slide="prev">
@@ -192,10 +192,12 @@ $offset = ($current_page - 1) * $items_per_page; // Calculate offset
                                END,
                                CASE 
                                    WHEN l.status = 'coming' THEN l.lecture_date
+                                  WHEN l.status = 'coming' AND l.lecture_date IS NULL THEN '9999-12-31' -- 將 null 日期排在最後
                                    ELSE NULL
                                END ASC,
                                CASE 
                                    WHEN l.status != 'coming' THEN l.lecture_date
+                                   WHEN l.status != 'coming' AND l.lecture_date IS NULL THEN '0000-01-01' -- 將 null 日期排在最前
                                    ELSE NULL
                                END DESC
                            LIMIT ? OFFSET ?";
@@ -235,7 +237,7 @@ $offset = ($current_page - 1) * $items_per_page; // Calculate offset
                                     <dl class="lecture_detail">
                                         <div class="lecture-item">
                                             <dt>Date |</dt>
-                                            <dd><?php echo date('F j, Y', strtotime($lecture['lecture_date'])); ?></dd>
+                                            <dd><?php echo $lecture['lecture_date'] ? date('F j, Y', strtotime($lecture['lecture_date'])) : 'TBD'; ?></dd>
                                         </div>
                                         <div class="lecture-item">
                                             <dt>Time |</dt>

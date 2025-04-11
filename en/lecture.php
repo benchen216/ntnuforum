@@ -128,7 +128,7 @@ $categories_result = $conn->query($categories_sql);
                                 <dl class="lecture_detail">
                                     <div class="lecture-item">
                                         <dt>Date |</dt>
-                                        <dd><?php echo date('F j, Y', strtotime($lecture['lecture_date'])); ?></dd>
+                                        <dd><?php echo $lecture['lecture_date'] ? date('F j, Y', strtotime($lecture['lecture_date'])) : 'TBD'; ?></dd>
                                     </div>
                                     <div class="lecture-item">
                                         <dt>Time |</dt>

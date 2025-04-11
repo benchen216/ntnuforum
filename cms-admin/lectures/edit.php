@@ -48,7 +48,6 @@ if(isset($_POST['submit'])) {
         'speaker_en' => '講者姓名(英文)',
         'speaker_title' => '講者頭銜(中文)',
         'speaker_title_en' => '講者頭銜(英文)',
-        'lecture_date' => '講座日期',
         'lecture_time' => '講座時間',
         'location' => '地點(中文)',
         'location_en' => '地點(英文)',
@@ -74,7 +73,7 @@ if(isset($_POST['submit'])) {
         $speaker_title_en = str_replace(["\r\n", "\r"], "\n",$_POST['speaker_title_en']);
 
         // 時間地點
-        $lecture_date = $conn->real_escape_string($_POST['lecture_date']);
+        $lecture_date = !empty($_POST['lecture_date']) ? $_POST['lecture_date'] : null;
         $lecture_time = $conn->real_escape_string($_POST['lecture_time']);
         $location = $conn->real_escape_string($_POST['location']);
         $location_en = $conn->real_escape_string($_POST['location_en']);
@@ -163,6 +162,9 @@ if(isset($_POST['submit'])) {
 
         if ($stmt->execute()) {
             $_SESSION['message'] = "講座更新成功！";
+            // 重新整理 目前網址
+            header('Location: ' . $_SERVER['REQUEST_URI']);
+            exit();
         } else {
             $error = "發生錯誤，請稍後再試。";
         }
@@ -324,11 +326,11 @@ require_once '../includes/header.php';
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">講座日期</label>
-                                    <input type="date" name="lecture_date" class="form-control" required
+                                    <input type="date" name="lecture_date" class="form-control"
                                            value="<?php echo $lecture['lecture_date']; ?>">
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">講座時間</label>
+                                    <label class="form-label">講座時間 <span class="text-danger">*</span></label>
                                     <input type="text" name="lecture_time" class="form-control" required
                                            value="<?php echo htmlspecialchars($lecture['lecture_time']); ?>">
                                 </div>
@@ -336,12 +338,12 @@ require_once '../includes/header.php';
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">地點(中文)</label>
+                                    <label class="form-label">地點(中文) <span class="text-danger">*</span></label>
                                     <input type="text" name="location" class="form-control" required
                                            value="<?php echo htmlspecialchars($lecture['location']); ?>">
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">地點(英文)</label>
+                                    <label class="form-label">地點(英文) <span class="text-danger">*</span></label>
                                     <input type="text" name="location_en" class="form-control" required
                                            value="<?php echo htmlspecialchars($lecture['location_en']); ?>">
                                 </div>
@@ -357,7 +359,7 @@ require_once '../includes/header.php';
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-4 mb-3">
-                                    <label class="form-label">講座類別</label>
+                                    <label class="form-label">講座類別 <span class="text-danger">*</span></label>
                                     <select name="category_id" class="form-select" required>
                                         <option value="">請選擇類別</option>
                                         <?php
@@ -456,13 +458,13 @@ require_once '../includes/header.php';
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-4 mb-3">
-                                    <label class="form-label">主辦單位(中文)</label>
+                                    <label class="form-label">主辦單位(中文) <span class="text-danger">*</span></label>
                                     <input type="text" name="organizer" class="form-control" required
                                            value="<?php echo htmlspecialchars($lecture['organizer']); ?>">
                                     <small>每個單位間需换行</small>
                                 </div>
                                 <div class="col-md-4 mb-3">
-                                    <label class="form-label">主辦單位(英文)</label>
+                                    <label class="form-label">主辦單位(英文) <span class="text-danger">*</span></label>
                                     <input type="text" name="organizer_en" class="form-control" required
                                            value="<?php echo htmlspecialchars($lecture['organizer_en']); ?>">
                                     <small>每個單位間需换行</small>
