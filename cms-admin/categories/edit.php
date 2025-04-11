@@ -160,27 +160,49 @@ require_once '../includes/header.php';
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">類別名稱(中文)</label>
+                                <label class="form-label">類別名稱(中文)<span class="text-danger">*</span></label>
                                 <input type="text" name="name" class="form-control" value="<?php echo htmlspecialchars($category['name']); ?>" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">類別名稱(英文)</label>
+                                <label class="form-label">類別名稱(英文)<span class="text-danger">*</span></label>
                                 <input type="text" name="name_en" class="form-control" value="<?php echo htmlspecialchars($category['name_en']); ?>" required>
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">網址別名</label>
+                            <label class="form-label">網址別名<span class="text-danger">*</span></label>
                             <input type="text" name="slug" class="form-control" value="<?php echo htmlspecialchars($category['slug']); ?>" required>
-                            <div class="form-text">請使用英文小寫、數字和連字符(-)</div>
+                            <div class="form-text">請使用英文小寫、數字和連字符(-)、修改後圖片需要重新上傳</div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Banner 圖片</label>
+                            <?php
+                            $banner_path = '../../assets/img/banner/' . $category['slug'] . '.jpg';
+                            if(file_exists($banner_path)):
+                                ?>
+                                <div class="mb-2">
+                                    <img src="/series_lecture/assets/img/banner/<?php echo $category['slug']; ?>.jpg"
+                                         class="img-fluid"
+                                         style="max-height: 200px; width: auto;"
+                                         alt="目前 Banner 圖片">
+                                </div>
+                            <?php endif; ?>
                             <input type="file" name="banner" class="form-control" accept="image/jpeg,image/png">
                             <div class="form-text">建議尺寸 1920x1080 像素，格式為 JPG</div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Banner 圖片 (英文版)</label>
+                            <?php
+                            $banner_en_path = '../../en/assets/img/banner/' . $category['slug'] . '.jpg';
+                            if(file_exists($banner_en_path)):
+                                ?>
+                                <div class="mb-2">
+                                    <img src="/series_lecture/en/assets/img/banner/<?php echo $category['slug']; ?>.jpg"
+                                         class="img-fluid"
+                                         style="max-height: 200px; width: auto;"
+                                         alt="目前英文版 Banner 圖片">
+                                </div>
+                            <?php endif; ?>
                             <input type="file" name="banner_en" class="form-control" accept="image/jpeg,image/png">
                             <div class="form-text">建議尺寸 1920x1080 像素，格式為 JPG</div>
                         </div>
@@ -200,6 +222,7 @@ require_once '../includes/header.php';
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">排序順序</label>
                                 <input type="number" name="sort_order" class="form-control" value="<?php echo htmlspecialchars($category['sort_order']); ?>">
+                                <div class="form-text">由小到大排序，若數字相同，則依據類別建立時間排序（越早建立越前）。</div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <div class="form-check mt-4">

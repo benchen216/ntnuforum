@@ -121,17 +121,17 @@ require_once '../includes/header.php';
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">類別名稱(中文)</label>
+                                <label class="form-label">類別名稱(中文)<span class="text-danger">*</span></label>
                                 <input type="text" name="name" class="form-control" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">類別名稱(英文)</label>
+                                <label class="form-label">類別名稱(英文)<span class="text-danger">*</span></label>
                                 <input type="text" name="name_en" class="form-control" required>
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">網址別名</label>
+                            <label class="form-label">網址別名<span class="text-danger">*</span></label>
                             <input type="text" name="slug" class="form-control" required>
                             <div class="form-text">請使用英文小寫、數字和連字符(-)</div>
                         </div>
@@ -161,6 +161,7 @@ require_once '../includes/header.php';
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">排序順序</label>
                                 <input type="number" name="sort_order" class="form-control" value="0">
+                                <div class="form-text">由小到大排序，若數字相同，則依據類別建立時間排序（越早建立越前）。</div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <div class="form-check mt-4">
@@ -176,6 +177,34 @@ require_once '../includes/header.php';
                     <button type="submit" name="submit" class="btn btn-primary">新增類別</button>
                     <a href="index.php" class="btn btn-secondary">取消</a>
                 </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const nameEnInput = document.querySelector('input[name="name_en"]');
+                        const slugInput = document.querySelector('input[name="slug"]');
+
+                        // 轉換函數：將英文名稱轉換為合法的 slug
+                        function convertToSlug(text) {
+                            return text
+                                .toLowerCase() // 轉小寫
+                                .replace(/[^a-z0-9-]/g, '-') // 非英文數字轉為連字符
+                                .replace(/--+/g, '-') // 多個連字符轉為單個
+                                .replace(/^-+|-+$/g, ''); // 移除開頭和結尾的連字符
+                        }
+
+                        // 當英文名稱改變時自動更新 slug
+                        nameEnInput.addEventListener('input', function() {
+                            // 只有在 slug 欄位為空，或使用者尚未手動修改過 slug 時才自動更新
+                            if (!slugInput.dataset.manuallyChanged) {
+                                slugInput.value = convertToSlug(this.value);
+                            }
+                        });
+
+                        // 標記使用者是否手動修改過 slug
+                        slugInput.addEventListener('input', function() {
+                            this.dataset.manuallyChanged = 'true';
+                        });
+                    });
+                </script>
             </form>
         </main>
     </div>

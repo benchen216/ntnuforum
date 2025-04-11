@@ -31,7 +31,7 @@ CREATE TABLE `lectures` (
                             `speaker_photo` varchar(255) DEFAULT NULL COMMENT '講者照片',
 
     -- 時間地點
-                            `lecture_date` date NOT NULL COMMENT '講座日期',
+                            `lecture_date` date  COMMENT '講座日期',
                             `lecture_time` varchar(50) NOT NULL COMMENT '講座時間',
                             `location` varchar(255) NOT NULL COMMENT '講座地點(中文)',
                             `location_en` varchar(255) NOT NULL COMMENT '講座地點(英文)',

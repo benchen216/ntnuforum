@@ -163,8 +163,6 @@ if(isset($_POST['submit'])) {
 
         if ($stmt->execute()) {
             $_SESSION['message'] = "講座更新成功！";
-            header('Location: index.php');
-            exit();
         } else {
             $error = "發生錯誤，請稍後再試。";
         }
