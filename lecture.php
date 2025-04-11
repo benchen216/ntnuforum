@@ -58,6 +58,10 @@ $categories_result = $conn->query($categories_sql);
     <link href="assets/css/style.css" rel="stylesheet" />
     <link href="assets/css/responsive.css" rel="stylesheet" />
     <link href="assets/css/main.css" rel="stylesheet">
+    <!-- Google Analytics -->
+    <?php if(!empty($settings['google_analytics_code'])): ?>
+        <?php echo $settings['google_analytics_code']; ?>
+    <?php endif; ?>
 </head>
 
 <body class="index-page">
@@ -78,7 +82,7 @@ $categories_result = $conn->query($categories_sql);
                             $categories_result->data_seek(0);
                             while($category = $categories_result->fetch_assoc()): ?>
                                 <li><a href="index.php?category=<?php echo htmlspecialchars($category['slug']); ?>">
-                                        <?php echo htmlspecialchars($category['name']); ?>系列
+                                        <?php echo htmlspecialchars($category['name']); ?>
                                     </a></li>
                             <?php endwhile; ?>
                         </ul>

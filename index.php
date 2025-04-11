@@ -49,6 +49,10 @@ $offset = ($current_page - 1) * $items_per_page; // 計算偏移量
     <link href="assets/css/responsive.css" rel="stylesheet" />
     <!-- Main CSS File -->
     <link href="assets/css/main.css" rel="stylesheet">
+    <!-- Google Analytics -->
+    <?php if(!empty($settings['google_analytics_code'])): ?>
+        <?php echo $settings['google_analytics_code']; ?>
+    <?php endif; ?>
 </head>
 
 <body class="index-page">
@@ -77,7 +81,7 @@ $offset = ($current_page - 1) * $items_per_page; // 計算偏移量
                 </ul>
                 <i id="hbg" class="mobile-nav-toggle d-xl-none bi bi-list"></i>
             </nav>
-            <a class="cta-btn" href="en/index.php">English</a>
+            <a class="cta-btn" href="en/index.php<?php echo isset($_GET['category']) ? '?category=' . htmlspecialchars($_GET['category']) : ''; ?>">English</a>
         </div>
     </div>
 </header>
@@ -147,7 +151,7 @@ $offset = ($current_page - 1) * $items_per_page; // 計算偏移量
                             }
                         }
                         ?>
-                        系列講座
+                        講座
                     </h2>
                 </div>
                 <ul class="filters_menu">

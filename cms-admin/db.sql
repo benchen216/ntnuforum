@@ -97,5 +97,6 @@ CREATE TABLE `website_settings` (
                                     `meta_description_en` text DEFAULT NULL COMMENT 'Meta描述(英文)',
                                     `copyright_text` text DEFAULT NULL COMMENT '版權聲明(中文)',
                                     `copyright_text_en` text DEFAULT NULL COMMENT '版權聲明(英文)',
-                                    `sw_english` tinyint(1) DEFAULT 0 COMMENT '是否顯示英文版'
+                                    `sw_english` tinyint(1) DEFAULT 0 COMMENT '是否顯示英文版',
+                                    `google_analytics_code` text DEFAULT NULL COMMENT 'Google Analytics Code',
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -39,6 +39,10 @@ $offset = ($current_page - 1) * $items_per_page; // Calculate offset
     <link href="../assets/css/style.css" rel="stylesheet" />
     <link href="../assets/css/responsive.css" rel="stylesheet" />
     <link href="../assets/css/main.css" rel="stylesheet">
+    <!-- Google Analytics -->
+    <?php if(!empty($settings['google_analytics_code'])): ?>
+        <?php echo $settings['google_analytics_code']; ?>
+    <?php endif; ?>
 </head>
 
 <body class="index-page">
@@ -67,7 +71,7 @@ $offset = ($current_page - 1) * $items_per_page; // Calculate offset
                 </ul>
                 <i id="hbg" class="mobile-nav-toggle d-xl-none bi bi-list"></i>
             </nav>
-            <a class="cta-btn" href="../index.php">中文</a>
+            <a class="cta-btn" href="../index.php<?php echo isset($_GET['category']) ? '?category=' . htmlspecialchars($_GET['category']) : ''; ?>">中文</a>
         </div>
     </div>
 </header>
